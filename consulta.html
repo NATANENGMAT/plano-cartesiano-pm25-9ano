@@ -2,9 +2,332 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=index.html#consulta" />
-  <title>Consulta de Alunos e Responsáveis — Redirecionando...</title>
-  <script>window.location.replace("index.html#consulta");</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Consulta de Entrega • Plano Cartesiano (9º Ano) — Prof. Natanael</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-page: #f5f5f7;
+      --card-bg: #ffffff;
+      --text-main: #1d1d1f;
+      --text-secondary: #515154;
+      --text-muted: #86868b;
+      --green: #2cc96b;
+      --green-dark: #1fa352;
+      --green-light: #e8fbf0;
+      --dark: #191919;
+      --blue: #2f6fed;
+      --border: #e5e5ea;
+      --shadow: 0 12px 34px -6px rgba(0, 0, 0, 0.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .logo-box {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--dark);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+    .back-link {
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--blue);
+      background: #eef4ff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    main {
+      max-width: 700px;
+      margin: 20px auto 60px;
+      padding: 0 14px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 22px;
+      padding: 24px 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #0f6e36;
+      background: var(--green-light);
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    p.sub {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    label {
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+    .turma-pills {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .turma-btn {
+      padding: 14px 10px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .turma-btn.selected {
+      border-color: var(--green);
+      background: var(--green-light);
+      color: #0b4f26;
+    }
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: #fff;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .pill.ok { background: var(--green-light); color: #0d5c2d; }
+    .pill.no { background: #fef3c7; color: #92400e; }
+  </style>
 </head>
-<body></body>
+<body>
+  <header>
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <div class="logo-box">xy</div>
+        <div>
+          <div>Prof. Natanael • Matemática — 9º Ano</div>
+          <div style="font-size: 0.73rem; font-weight: 600; color: var(--text-muted);">Consulta de Alunos e Responsáveis</div>
+        </div>
+      </a>
+      <a class="back-link" href="index.html">← Ir para Atividade</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <span class="eyebrow">👨‍👩‍👧 Acompanhamento de Entrega • 9º Ano</span>
+      <h1>Consulta de Alunos e Responsáveis</h1>
+      <p class="sub">
+        Selecione a <strong>turma</strong> e depois o <strong>nome do aluno</strong> para conferir se a atividade de Matemática (Plano Cartesiano) já consta como entregue:
+      </p>
+
+      <div class="field-group">
+        <label>1. Selecione a Turma:</label>
+        <div class="turma-pills" id="turma-pills"></div>
+      </div>
+
+      <div class="field-group">
+        <label for="student-select">2. Selecione o Nome do Aluno:</label>
+        <select id="student-select" onchange="checkDelivery()">
+          <option value="">Primeiro selecione a turma acima...</option>
+        </select>
+      </div>
+
+      <div id="result-box" style="margin-top: 20px; display: none;"></div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://bxvuqwnmqooxaoexnjty.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_gv_lK9K2hrReKQvC-5Ou7Q_vI9c1NwI";
+    const SUPABASE_TABLE = "previsoes_pm25_9ano";
+
+    const ROSTERS = {
+      "9º 1": [
+        "ALICE LIMA", "ANA BEATRIZ", "ANA CLARA DA CRUZ", "ARTHUR MATHEUS", "ARTHUR VINICIUS",
+        "BRENDA LOHANY", "CALEBE MENDES", "EMANUELY MARIA", "FERNANDA DUARTE", "GUILHERME CARDOSO",
+        "HELOISA SAMPAIO", "ISABELA LOUISE", "ISABELLA MACEDO", "JAMILLE ESTEFANY", "JASMIM DA SILVA",
+        "JOAO GUILHERME", "JOSE HENRIQUE MOURA", "JULIANY ROCHA", "KEVEN GUILHERME", "LAURA SOPHYA",
+        "LAYANE KAROLINE", "LORRANA GABRIELLY", "LUCAS MAZETTI", "MARIA ALICE", "MARIA EDUARDA LACERDA",
+        "MARIA EDUARDA LIMA", "MATEUS HENRIQUE", "MELISSA PAULA", "PEDRO GENTIL", "PEDRO HENRIQUE",
+        "PEDRO IGOR", "PERICLES DANIEL", "RAONI FERREIRA", "RENATO GABRIEL", "SIDNEY SOUZA",
+        "YASMIM BATISTA", "NATANAEL MELHOR ALUNO"
+      ],
+      "9º 2": [
+        "ANA CLAYRE", "ANA VITORIA", "ANNE BEATRIZ", "BREENDO RIBEIRO", "DANILO CAUE",
+        "DYEGO MELO", "EMANUELY VITORIA", "GLENDA LARISSA", "GUSTAVO ARMSTRONG", "JHESSICA ALMEIDA",
+        "JOAO CARLOS", "JOAO PEDRO", "JOAO VITOR", "JOSUE RAFAEL", "JULIA OLIVEIRA",
+        "JULIANA SILVA", "KAUA GABRIEL", "KAYO ADRIANO", "LARA RUANA", "LETICIA TAVARES",
+        "MARCO ANTONIO", "MARINA ALICE", "MELYSSA GLENDIANE", "MIKAELLY ALVES", "NIVALDO RODRIGUES",
+        "PEDRO MESQUITA", "PEDRO VICTOR", "RAICCA GABRIELLE", "RAQUEL GAMA", "RENAN MATHEUS",
+        "SALOMAO GOMES", "SELMA KAUANY", "SOPHIA PINHEIRO", "SOPHIA SILVA", "VICTOR GABRIEL",
+        "YASMIN VITORIA", "NATANAEL MELHOR ALUNO"
+      ],
+      "9º 4": [
+        "ALEXSANDER DE OLIVEIRA", "ANA JULIA", "ANGELO GABRIEL", "ANNE BEATRICE", "ASAFE RHYETRO",
+        "BRISA LOHAINY", "CARLOS EDUARDO", "DAVI OLIVEIRA", "EMILLY FERNANDA", "ERIKE LUIZ",
+        "FABIO GONCALVES", "FERNANDO NASCIMENTO", "GUILHERME DA SILVA", "GUILHERME VALE", "ISMAEL GOMES",
+        "JHON ANDREW", "JOSE VICTOR", "JOSUE NICHOLLAS", "KAUA CANTUARIO", "LUIZ FABIANO",
+        "MANUELA SILVA", "MARIA EDUARDA", "MAYSA PYETRA", "NATHANAEL DUTRA", "PAULO SAMUEL",
+        "PIETRO FERREIRA", "RENAN GOMES", "RENAN RAMOS", "SAMANTA VITORIA", "SAMILA HELOISA",
+        "SARA CRISTINA", "SARA FERNANDA", "SARA VICTORIA", "SERGIO LUCAS", "THAYNNA RUANNE",
+        "VITOR DANIEL", "NATANAEL MELHOR ALUNO"
+      ]
+    };
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+
+    let selectedTurma = "";
+
+    function renderTurmas() {
+      document.getElementById("turma-pills").innerHTML = Object.keys(ROSTERS)
+        .map(
+          (t) => `
+          <button type="button" class="turma-btn ${selectedTurma === t ? 'selected' : ''}" onclick="selectTurma('${t}')">
+            Turma ${t}
+          </button>
+        `
+        )
+        .join("");
+    }
+
+    function selectTurma(t) {
+      selectedTurma = t;
+      renderTurmas();
+      const sel = document.getElementById("student-select");
+      sel.innerHTML =
+        `<option value="">-- Selecione o nome (${t}) --</option>` +
+        ROSTERS[t].map((n) => `<option value="${n}">${n}</option>`).join("");
+      document.getElementById("result-box").style.display = "none";
+    }
+
+    async function checkDelivery() {
+      const nome = document.getElementById("student-select").value;
+      const box = document.getElementById("result-box");
+      if (!selectedTurma || !nome) {
+        box.style.display = "none";
+        return;
+      }
+
+      box.style.display = "block";
+      box.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-muted);">Consultando registro...</p>`;
+
+      let found = null;
+      try {
+        const { data } = await supabaseClient
+          .from(SUPABASE_TABLE)
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(400);
+
+        if (Array.isArray(data)) {
+          found = data.find((r) => {
+            const rTurma = String(r.turma || "").replace(/\uFFFD/g, "º").trim();
+            const rNome = String(r.aluno_nome || "").trim().toUpperCase();
+            return rNome === nome.toUpperCase() && (rTurma === selectedTurma || !rTurma);
+          });
+        }
+      } catch (e) {}
+
+      if (found) {
+        const dt = found.created_at
+          ? new Date(found.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" })
+          : "Registrado hoje";
+        box.innerHTML = `
+          <div style="padding: 20px; border-radius: 18px; background: var(--green-light); border: 2px solid var(--green);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+              <span class="pill ok">✓ ENTREGA CONFIRMADA</span>
+              <span style="font-size: 0.8rem; font-weight: 700; color: #134e2a;">Recebida em: ${dt} (Manaus)</span>
+            </div>
+            <h3 style="font-size: 1.18rem; font-weight: 800; color: #0b4f26;">${nome} • Turma ${selectedTurma}</h3>
+            <p style="font-size: 0.9rem; color: #134e2a; margin-top: 6px;">
+              A atividade de Matemática (Plano Cartesiano e Qualidade do Ar em Manaus) foi concluída e recebida pelo Prof. Natanael.
+            </p>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div style="padding: 20px; border-radius: 18px; background: #fffbeb; border: 2px solid #fcd34d;">
+            <span class="pill no">⏳ PENDENTE DE ENTREGA</span>
+            <h3 style="font-size: 1.18rem; font-weight: 800; color: #78350f; margin-top: 10px;">${nome} • Turma ${selectedTurma}</h3>
+            <p style="font-size: 0.9rem; color: #92400e; margin-top: 6px;">
+              Ainda não consta entrega registrada para este estudante. <a href="index.html" style="color: #92400e; font-weight: 800;">Toque aqui para abrir e realizar a atividade</a>.
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    renderTurmas();
+  </script>
+</body>
 </html>

@@ -1146,22 +1146,14 @@
         </div>
       </div>
 
-      <nav class="module-tabs" id="top-module-tabs" aria-label="Navegação" style="display: none;">
-        <button class="module-tab-btn active" id="tab-btn-aluno" onclick="switchPlatformModule('aluno')">
-          Atividade dos alunos
-        </button>
-        <button class="module-tab-btn" id="tab-btn-professor" onclick="switchPlatformModule('professor')">
-          Painel do professor
-        </button>
-        <button class="module-tab-btn" id="tab-btn-consulta" onclick="switchPlatformModule('consulta')">
-          Consulta de entrega
-        </button>
-      </nav>
+      <a href="consulta.html" style="text-decoration: none; font-size: 0.8rem; font-weight: 700; color: var(--brilliant-blue); background: #eef4ff; padding: 8px 14px; border-radius: 999px;">
+        Consultar entrega
+      </a>
     </div>
   </header>
 
   <!-- =========================================================================
-       MÓDULO 1: [ATIVIDADE DOS ALUNOS]
+       ATIVIDADE DOS ALUNOS — 9º ANO (9º 1, 9º 2, 9º 4)
        ========================================================================= -->
   <div class="view-section active" id="module-aluno">
 
@@ -1235,107 +1227,6 @@
     </div>
   </div>
 
-  <!-- =========================================================================
-       MÓDULO 2: [PAINEL DO PROFESSOR]
-       ========================================================================= -->
-  <div class="view-section" id="module-professor">
-    <div class="dashboard-wrap">
-      <div class="brilliant-card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
-          <div>
-            <span class="page-kicker">📊 Painel do Professor • Matemática 9º Ano</span>
-            <h2>Acompanhamento de Entregas — Plano Cartesiano (PM 2,5)</h2>
-            <p class="lead-text" style="margin-bottom: 0;">
-              Relatório em tempo real das entregas das turmas <strong>9º 1</strong>, <strong>9º 2</strong> e <strong>9º 4</strong>.
-            </p>
-          </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <select class="select-control" id="prof-filter-turma" style="width: auto; padding: 10px 14px;" onchange="loadTeacherDashboard()">
-              <option value="TODAS">Todas as Turmas (9º Ano)</option>
-            </select>
-            <button class="btn-check" onclick="loadTeacherDashboard()">🔄 Atualizar Agora</button>
-            <button class="btn-check" style="background: var(--brilliant-green-dark);" onclick="exportTeacherCsv()">📥 Baixar CSV</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-label">Entregas Confirmadas</div>
-          <div class="kpi-value" id="kpi-total">0</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Média Previsão 06h (Pós-Chuva)</div>
-          <div class="kpi-value" id="kpi-avg-pm25">-- µg/m³</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Previram Ar Mais Limpo (&lt; 160)</div>
-          <div class="kpi-value" id="kpi-rain-effect">--%</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Turmas do 9º Ano</div>
-          <div class="kpi-value" style="font-size: 1.15rem; color: var(--brilliant-green-dark); margin-top: 8px;">
-            9º 1 • 9º 2 • 9º 4
-          </div>
-        </div>
-      </div>
-
-      <div class="brilliant-card">
-        <h2 style="margin-bottom: 14px;">Registros por Aluno</h2>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Horário (Manaus)</th>
-                <th>Turma</th>
-                <th>Nome do Aluno</th>
-                <th>Chute Final (06h)</th>
-                <th>Progresso</th>
-                <th>Situação</th>
-              </tr>
-            </thead>
-            <tbody id="prof-table-body">
-              <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted);">Carregando...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- =========================================================================
-       MÓDULO 3: [CONSULTA DE ALUNOS E RESPONSÁVEIS]
-       ========================================================================= -->
-  <div class="view-section" id="module-consulta">
-    <div class="brilliant-stage">
-      <section class="brilliant-card">
-        <span class="page-kicker emerald">👨‍👩‍👧 Consulta Pública de Entrega</span>
-        <h2>Consulta de Alunos e Responsáveis</h2>
-        <p class="lead-text">
-          Selecione a <strong>turma</strong> e depois o <strong>próprio nome</strong> para verificar imediatamente o status de entrega da atividade de Matemática (Plano Cartesiano & Poluição do Ar em Manaus).
-        </p>
-
-        <div class="login-grid">
-          <div class="field-group">
-            <label class="field-label">1. Selecione a Turma:</label>
-            <div class="turma-pills" id="consulta-turma-pills"></div>
-          </div>
-
-          <div class="field-group">
-            <label class="field-label" for="consulta-student-select">2. Selecione o Nome do Aluno:</label>
-            <select class="select-control" id="consulta-student-select" onchange="runParentStudentLookup()">
-              <option value="">Escolha uma turma acima...</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="consulta-result-box" style="margin-top: 24px; display: none;"></div>
-      </section>
-    </div>
-  </div>
-
   <script>
     /* =========================================================================
        1. CONFIGURAÇÃO OFICIAL DO SUPABASE (PROJETO terceiroremota14)
@@ -1397,12 +1288,8 @@
 
     let selectedLoginTurma = "";
     let selectedStudentName = "";
-    let selectedConsultaTurma = "";
-
     function initTurmaUI() {
       const turmas = Object.keys(ROSTERS);
-
-      // Botões de turma na tela de entrada do aluno
       document.getElementById("login-turma-pills").innerHTML = turmas
         .map(
           (t) => `
@@ -1413,23 +1300,6 @@
         `
         )
         .join("");
-
-      // Botões de turma na aba de consulta de alunos e responsáveis
-      document.getElementById("consulta-turma-pills").innerHTML = turmas
-        .map(
-          (t) => `
-          <button type="button" class="turma-pill-btn ${selectedConsultaTurma === t ? 'selected' : ''}"
-                  onclick="selectTurmaForConsulta('${t}')">
-            Turma ${t}
-          </button>
-        `
-        )
-        .join("");
-
-      // Filtro do professor
-      document.getElementById("prof-filter-turma").innerHTML =
-        `<option value="TODAS">Todas as Turmas</option>` +
-        turmas.map((t) => `<option value="${t}">Turma ${t}</option>`).join("");
     }
 
     function selectTurmaForLogin(turma) {
@@ -2346,199 +2216,6 @@
       return [];
     }
 
-    /* =========================================================================
-       9. PAINEL DO PROFESSOR E CONSULTA DE ALUNOS E RESPONSÁVEIS
-       ========================================================================= */
-    async function fetchAllSubmissionsUnified() {
-      const localData = getLocalSubmissions();
-      if (!supabaseClient) return localData;
-
-      try {
-        const { data, error } = await supabaseClient
-          .from(SUPABASE_TABLE)
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(400);
-
-        if (!error && Array.isArray(data) && data.length > 0) {
-          const seen = new Set();
-          const uniqueRows = [];
-          for (const row of data) {
-            let turma = (row.turma || "").replace(/\uFFFD/g, "º");
-            let nome = (row.aluno_nome || "").trim();
-            if (!turma && nome.includes(" - ")) {
-              const parts = nome.split(" - ");
-              turma = parts[0].trim();
-              nome = parts.slice(1).join(" - ").trim();
-            }
-            const cleanTurma = turma || "9º Ano";
-            const key = `${cleanTurma.toUpperCase()}::${nome.toUpperCase()}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              uniqueRows.push({
-                turma: cleanTurma,
-                aluno_nome: nome,
-                pm25_previsto: Number(row.pm25_previsto),
-                created_at: row.created_at
-              });
-            }
-          }
-          return uniqueRows;
-        }
-      } catch (e) {}
-      return localData;
-    }
-
-    let cachedTeacherRows = [];
-
-    async function loadTeacherDashboard() {
-      const all = await fetchAllSubmissionsUnified();
-      const filterTurma = document.getElementById("prof-filter-turma").value;
-
-      const filtered =
-        filterTurma === "TODAS"
-          ? all
-          : all.filter((r) => r.turma === filterTurma);
-
-      cachedTeacherRows = filtered;
-      document.getElementById("kpi-total").textContent = filtered.length;
-
-      if (filtered.length > 0) {
-        const sum = filtered.reduce((acc, r) => acc + (Number(r.pm25_previsto) || 0), 0);
-        const avg = Math.round(sum / filtered.length);
-        const rainCount = filtered.filter((r) => Number(r.pm25_previsto) < 160).length;
-        const rainPct = Math.round((rainCount / filtered.length) * 100);
-
-        document.getElementById("kpi-avg-pm25").textContent = `${avg} µg/m³`;
-        document.getElementById("kpi-rain-effect").textContent = `${rainPct}%`;
-      } else {
-        document.getElementById("kpi-avg-pm25").textContent = "-- µg/m³";
-        document.getElementById("kpi-rain-effect").textContent = "--%";
-      }
-
-      const tbody = document.getElementById("prof-table-body");
-      if (filtered.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 26px;">
-              Nenhuma entrega registrada ainda para este filtro.
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tbody.innerHTML = filtered
-        .map((r) => {
-          const dt = r.created_at
-            ? new Date(r.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" })
-            : "Agora";
-          return `
-            <tr>
-              <td>${dt}</td>
-              <td><strong>${r.turma}</strong></td>
-              <td>${r.aluno_nome}</td>
-              <td><strong>(06h, ${r.pm25_previsto} µg/m³)</strong></td>
-              <td>8 / 8 páginas</td>
-              <td><span class="status-pill ok">✓ Entregue</span></td>
-            </tr>
-          `;
-        })
-        .join("");
-    }
-
-    function exportTeacherCsv() {
-      const head = ["Horario_Manaus", "Turma", "Aluno", "PM25_Previsto_06h", "Status"];
-      const rows = cachedTeacherRows.map((r) => [
-        r.created_at ? new Date(r.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" }) : "",
-        r.turma,
-        r.aluno_nome,
-        r.pm25_previsto,
-        "Entregue"
-      ]);
-      const csvContent =
-        "\uFEFF" +
-        [head, ...rows]
-          .map((line) => line.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(";"))
-          .join("\r\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "previsoes-pm25-9ano-manaus.csv";
-      link.click();
-    }
-
-    function selectTurmaForConsulta(turma) {
-      selectedConsultaTurma = turma;
-      initTurmaUI();
-
-      const names = ROSTERS[turma] || [];
-      const sel = document.getElementById("consulta-student-select");
-      sel.innerHTML =
-        `<option value="">-- Selecione o nome do aluno (${turma}) --</option>` +
-        names.map((n) => `<option value="${n}">${n}</option>`).join("");
-      document.getElementById("consulta-result-box").style.display = "none";
-    }
-
-    async function runParentStudentLookup() {
-      const studentName = document.getElementById("consulta-student-select").value;
-      const box = document.getElementById("consulta-result-box");
-      if (!selectedConsultaTurma || !studentName) {
-        box.style.display = "none";
-        return;
-      }
-
-      const all = await fetchAllSubmissionsUnified();
-      const match = all.find(
-        (r) =>
-          r.aluno_nome.toLowerCase() === studentName.toLowerCase() &&
-          (r.turma === selectedConsultaTurma || !r.turma)
-      );
-
-      box.style.display = "block";
-      if (match) {
-        const dt = match.created_at
-          ? new Date(match.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" })
-          : "Registrado hoje";
-        box.innerHTML = `
-          <div style="padding: 22px; border-radius: 18px; background: var(--brilliant-green-light); border: 2px solid var(--brilliant-green);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-              <span class="status-pill ok" style="font-size: 0.85rem;">✓ ENTREGA CONFIRMADA (8/8 ETAPAS)</span>
-              <span style="font-size: 0.82rem; font-weight: 700; color: #134e2a;">Recebida em: ${dt} (Manaus)</span>
-            </div>
-            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0b4f26;">${studentName} • Turma ${selectedConsultaTurma}</h3>
-            <p style="font-size: 0.94rem; color: #134e2a; margin-top: 8px;">
-              Atividade concluída com sucesso! O(a) estudante realizou todas as etapas interativas de Plano Cartesiano e Previsão Empírica de Qualidade do Ar (PM 2,5).
-            </p>
-            <div style="margin-top: 12px; padding: 10px 14px; background: #ffffff; border-radius: 12px; font-size: 0.9rem; font-weight: 700; color: var(--text-main);">
-              🌧️ Previsão Empírica Registrada (Amanhã às 06h): <strong>${match.pm25_previsto} µg/m³</strong>
-            </div>
-          </div>
-        `;
-      } else {
-        box.innerHTML = `
-          <div style="padding: 22px; border-radius: 18px; background: #fffbeb; border: 2px solid #fcd34d;">
-            <span class="status-pill pending">⏳ PENDENTE DE ENTREGA</span>
-            <h3 style="font-size: 1.2rem; font-weight: 800; color: #78350f; margin-top: 10px;">
-              ${studentName} • Turma ${selectedConsultaTurma}
-            </h3>
-            <p style="font-size: 0.92rem; color: #92400e; margin-top: 6px;">
-              Ainda não consta entrega registrada para este estudante. Acesse a aba <strong>"Atividade dos alunos"</strong> para realizar e enviar!
-            </p>
-          </div>
-        `;
-      }
-    }
-
-    function switchPlatformModule(mod) {
-      ["aluno", "professor", "consulta"].forEach((m) => {
-        document.getElementById(`module-${m}`).classList.toggle("active", m === mod);
-        document.getElementById(`tab-btn-${m}`).classList.toggle("active", m === mod);
-      });
-      if (mod !== "aluno") closeFeedbackTray();
-      if (mod === "professor") loadTeacherDashboard();
-    }
-
     function launchConfetti() {
       const canvas = document.getElementById("confetti-canvas");
       const ctx = canvas.getContext("2d");
@@ -2576,22 +2253,7 @@
       requestAnimationFrame(step);
     }
 
-    // Suporte a link direto via hash (#professor ou #consulta)
-    function checkUrlHash() {
-      const h = window.location.hash.replace("#", "").toLowerCase();
-      const tabsEl = document.getElementById("top-module-tabs");
-      if (h === "professor") {
-        if (tabsEl) tabsEl.style.display = "";
-        switchPlatformModule("professor");
-      } else if (h === "consulta") {
-        if (tabsEl) tabsEl.style.display = "";
-        switchPlatformModule("consulta");
-      }
-    }
-    window.addEventListener("hashchange", checkUrlHash);
-
     initTurmaUI();
-    checkUrlHash();
   </script>
 </body>
 </html>

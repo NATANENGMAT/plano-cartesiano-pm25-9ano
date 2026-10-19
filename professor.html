@@ -2,9 +2,588 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=index.html#professor" />
-  <title>Painel do Professor — Redirecionando...</title>
-  <script>window.location.replace("index.html#professor");</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Painel do Professor • Plano Cartesiano (9º Ano) — Prof. Natanael</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-page: #f5f5f7;
+      --card-bg: #ffffff;
+      --text-main: #1d1d1f;
+      --text-secondary: #515154;
+      --text-muted: #86868b;
+      --green: #2cc96b;
+      --green-dark: #1fa352;
+      --green-light: #e8fbf0;
+      --dark: #191919;
+      --blue: #2f6fed;
+      --border: #e5e5ea;
+      --shadow: 0 12px 34px -6px rgba(0, 0, 0, 0.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .logo-box {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--dark);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: #f0f0f5;
+      padding: 8px 14px;
+      border-radius: 999px;
+    }
+    main {
+      max-width: 1040px;
+      margin: 24px auto 60px;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .login-card {
+      max-width: 480px;
+      margin: 24px auto;
+      width: 100%;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--blue);
+      background: #eef4ff;
+      padding: 4px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    h1, h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    p.sub {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    label {
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+    input, select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: #fff;
+    }
+    .btn {
+      padding: 13px 20px;
+      border-radius: 999px;
+      border: none;
+      background: var(--dark);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.94rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn.green { background: var(--green-dark); }
+    .btn.secondary {
+      background: #f0f0f5;
+      color: var(--text-main);
+    }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .kpi-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .kpi-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #f8fafc;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+    .pill.ok { background: var(--green-light); color: #0d5c2d; }
+    .pill.no { background: #fef3c7; color: #92400e; }
+    [hidden] { display: none !important; }
+    @media (max-width: 640px) {
+      .card { padding: 18px 14px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
-<body></body>
+<body>
+  <header>
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <div class="logo-box">N</div>
+        <div>
+          <div>Professor Natanael • Painel do Professor</div>
+          <div style="font-size: 0.73rem; font-weight: 600; color: var(--text-muted);">Matemática • 9º Ano (9º 1, 9º 2 e 9º 4)</div>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Atividade</a>
+        <a href="consulta.html">Consulta Pública</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- LOGIN PROTEGIDO DO PROFESSOR -->
+    <section class="card login-card" id="teacher-login">
+      <span class="eyebrow">🔒 Acesso Exclusivo do Professor</span>
+      <h2>Entrar no Painel do Professor</h2>
+      <p class="sub">
+        Use a mesma conta e senha de professor das suas outras atividades remotas. Nenhum aluno tem acesso a esta área.
+      </p>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="teacher-email">E-mail do Professor</label>
+          <input id="teacher-email" type="email" value="natanael.igor.nogueira@prof.am.gov.br" readonly required />
+        </div>
+        <div class="form-group">
+          <label for="teacher-password">Senha</label>
+          <input id="teacher-password" type="password" autocomplete="current-password" placeholder="Digite sua senha de professor" required />
+        </div>
+        <button type="submit" class="btn" id="sign-in" style="width: 100%;">Entrar no Painel →</button>
+      </form>
+      <p id="login-message" style="margin-top: 12px; font-size: 0.88rem; font-weight: 700; color: #b91c1c;"></p>
+    </section>
+
+    <!-- DASHBOARD DO PROFESSOR (VISÍVEL APENAS APÓS LOGIN) -->
+    <section id="dashboard" hidden>
+      <div class="card" style="margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+          <div>
+            <span class="eyebrow">📊 Turmas 9º 1, 9º 2 e 9º 4</span>
+            <h1>Plano Cartesiano e Qualidade do Ar (PM 2,5)</h1>
+            <p class="sub" id="updated-text" style="margin-bottom: 0;">Acompanhamento de entregas e previsões empíricas do 9º Ano.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn" onclick="loadDashboard()">🔄 Atualizar</button>
+            <button type="button" class="btn green" onclick="exportCsv()">📥 Baixar CSV</button>
+            <button type="button" class="btn secondary" onclick="signOutTeacher()">Sair</button>
+          </div>
+        </div>
+
+        <div class="filters-grid">
+          <div>
+            <label for="filter-turma">Turma</label>
+            <select id="filter-turma" onchange="renderTable()">
+              <option value="">Todas (9º 1, 9º 2 e 9º 4)</option>
+              <option value="9º 1">Turma 9º 1</option>
+              <option value="9º 2">Turma 9º 2</option>
+              <option value="9º 4">Turma 9º 4</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-status">Situação</label>
+            <select id="filter-status" onchange="renderTable()">
+              <option value="">Todas</option>
+              <option value="yes">Entregue</option>
+              <option value="no">Pendente</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-name">Buscar Aluno</label>
+            <input id="filter-name" type="search" placeholder="Digite um nome..." oninput="renderTable()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid" style="margin-bottom: 16px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Total de Alunos</div>
+          <div class="kpi-value" id="kpi-all">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Entregues</div>
+          <div class="kpi-value" id="kpi-done" style="color: var(--green-dark);">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Pendentes</div>
+          <div class="kpi-value" id="kpi-pending" style="color: #b45309;">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Média Previsão 06h</div>
+          <div class="kpi-value" id="kpi-avg">-- µg/m³</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Turma</th>
+                <th>Aluno</th>
+                <th>Situação</th>
+                <th>Previsão 06h (PM 2,5)</th>
+                <th>Horário da Entrega (Manaus)</th>
+              </tr>
+            </thead>
+            <tbody id="student-rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://bxvuqwnmqooxaoexnjty.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_gv_lK9K2hrReKQvC-5Ou7Q_vI9c1NwI";
+    const SUPABASE_TABLE = "previsoes_pm25_9ano";
+    const TEACHER_EMAIL = "natanael.igor.nogueira@prof.am.gov.br";
+
+    const ROSTERS = {
+      "9º 1": [
+        "ALICE LIMA", "ANA BEATRIZ", "ANA CLARA DA CRUZ", "ARTHUR MATHEUS", "ARTHUR VINICIUS",
+        "BRENDA LOHANY", "CALEBE MENDES", "EMANUELY MARIA", "FERNANDA DUARTE", "GUILHERME CARDOSO",
+        "HELOISA SAMPAIO", "ISABELA LOUISE", "ISABELLA MACEDO", "JAMILLE ESTEFANY", "JASMIM DA SILVA",
+        "JOAO GUILHERME", "JOSE HENRIQUE MOURA", "JULIANY ROCHA", "KEVEN GUILHERME", "LAURA SOPHYA",
+        "LAYANE KAROLINE", "LORRANA GABRIELLY", "LUCAS MAZETTI", "MARIA ALICE", "MARIA EDUARDA LACERDA",
+        "MARIA EDUARDA LIMA", "MATEUS HENRIQUE", "MELISSA PAULA", "PEDRO GENTIL", "PEDRO HENRIQUE",
+        "PEDRO IGOR", "PERICLES DANIEL", "RAONI FERREIRA", "RENATO GABRIEL", "SIDNEY SOUZA",
+        "YASMIM BATISTA", "NATANAEL MELHOR ALUNO"
+      ],
+      "9º 2": [
+        "ANA CLAYRE", "ANA VITORIA", "ANNE BEATRIZ", "BREENDO RIBEIRO", "DANILO CAUE",
+        "DYEGO MELO", "EMANUELY VITORIA", "GLENDA LARISSA", "GUSTAVO ARMSTRONG", "JHESSICA ALMEIDA",
+        "JOAO CARLOS", "JOAO PEDRO", "JOAO VITOR", "JOSUE RAFAEL", "JULIA OLIVEIRA",
+        "JULIANA SILVA", "KAUA GABRIEL", "KAYO ADRIANO", "LARA RUANA", "LETICIA TAVARES",
+        "MARCO ANTONIO", "MARINA ALICE", "MELYSSA GLENDIANE", "MIKAELLY ALVES", "NIVALDO RODRIGUES",
+        "PEDRO MESQUITA", "PEDRO VICTOR", "RAICCA GABRIELLE", "RAQUEL GAMA", "RENAN MATHEUS",
+        "SALOMAO GOMES", "SELMA KAUANY", "SOPHIA PINHEIRO", "SOPHIA SILVA", "VICTOR GABRIEL",
+        "YASMIN VITORIA", "NATANAEL MELHOR ALUNO"
+      ],
+      "9º 4": [
+        "ALEXSANDER DE OLIVEIRA", "ANA JULIA", "ANGELO GABRIEL", "ANNE BEATRICE", "ASAFE RHYETRO",
+        "BRISA LOHAINY", "CARLOS EDUARDO", "DAVI OLIVEIRA", "EMILLY FERNANDA", "ERIKE LUIZ",
+        "FABIO GONCALVES", "FERNANDO NASCIMENTO", "GUILHERME DA SILVA", "GUILHERME VALE", "ISMAEL GOMES",
+        "JHON ANDREW", "JOSE VICTOR", "JOSUE NICHOLLAS", "KAUA CANTUARIO", "LUIZ FABIANO",
+        "MANUELA SILVA", "MARIA EDUARDA", "MAYSA PYETRA", "NATHANAEL DUTRA", "PAULO SAMUEL",
+        "PIETRO FERREIRA", "RENAN GOMES", "RENAN RAMOS", "SAMANTA VITORIA", "SAMILA HELOISA",
+        "SARA CRISTINA", "SARA FERNANDA", "SARA VICTORIA", "SERGIO LUCAS", "THAYNNA RUANNE",
+        "VITOR DANIEL", "NATANAEL MELHOR ALUNO"
+      ]
+    };
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+
+    let teacherSession = null;
+    let unifiedRows = [];
+
+    function normalizeStr(s) {
+      return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    }
+
+    async function authTeacher(password) {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email: TEACHER_EMAIL, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.msg || data.error_description || data.message || "Senha incorreta. Confira os dados.");
+      }
+      return data;
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("sign-in");
+      const msg = document.getElementById("login-message");
+      btn.disabled = true;
+      msg.textContent = "Verificando acesso...";
+      try {
+        const pw = document.getElementById("teacher-password").value;
+        teacherSession = await authTeacher(pw);
+        sessionStorage.setItem("pm25_9ano_teacher_session", JSON.stringify(teacherSession));
+        document.getElementById("teacher-password").value = "";
+        msg.textContent = "";
+        showDashboard();
+      } catch (err) {
+        msg.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function signOutTeacher() {
+      teacherSession = null;
+      sessionStorage.removeItem("pm25_9ano_teacher_session");
+      document.getElementById("dashboard").hidden = true;
+      document.getElementById("teacher-login").hidden = false;
+    }
+
+    function showDashboard() {
+      document.getElementById("teacher-login").hidden = true;
+      document.getElementById("dashboard").hidden = false;
+      loadDashboard();
+    }
+
+    async function loadDashboard() {
+      if (!teacherSession) return;
+      const { data } = await supabaseClient
+        .from(SUPABASE_TABLE)
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(500);
+
+      const latestByStudent = new Map();
+      if (Array.isArray(data)) {
+        for (const r of data) {
+          let turma = String(r.turma || "").replace(/\uFFFD/g, "º").trim();
+          let nome = String(r.aluno_nome || "").trim();
+          if (!turma && nome.includes(" - ")) {
+            const p = nome.split(" - ");
+            turma = p[0].trim();
+            nome = p.slice(1).join(" - ").trim();
+          }
+          const key = `${normalizeStr(turma)}::${normalizeStr(nome)}`;
+          if (!latestByStudent.has(key)) {
+            latestByStudent.set(key, {
+              turma,
+              nome,
+              pm25_previsto: Number(r.pm25_previsto),
+              created_at: r.created_at
+            });
+          }
+        }
+      }
+
+      const list = [];
+      for (const [turma, nomes] of Object.entries(ROSTERS)) {
+        for (const nome of nomes) {
+          const key = `${normalizeStr(turma)}::${normalizeStr(nome)}`;
+          const sub = latestByStudent.get(key);
+          list.push({
+            turma,
+            nome,
+            entregue: Boolean(sub),
+            pm25_previsto: sub ? sub.pm25_previsto : null,
+            created_at: sub ? sub.created_at : null
+          });
+        }
+      }
+
+      unifiedRows = list;
+      document.getElementById("updated-text").textContent =
+        `Atualizado em ${new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Manaus" })} (Manaus).`;
+      renderTable();
+    }
+
+    function getFilteredRows() {
+      const fTurma = document.getElementById("filter-turma").value;
+      const fStatus = document.getElementById("filter-status").value;
+      const fName = normalizeStr(document.getElementById("filter-name").value);
+
+      return unifiedRows.filter((r) => {
+        if (fTurma && r.turma !== fTurma) return false;
+        if (fStatus === "yes" && !r.entregue) return false;
+        if (fStatus === "no" && r.entregue) return false;
+        if (fName && !normalizeStr(r.nome).includes(fName)) return false;
+        return true;
+      });
+    }
+
+    function renderTable() {
+      const fTurma = document.getElementById("filter-turma").value;
+      const classGroup = unifiedRows.filter((r) => !fTurma || r.turma === fTurma);
+      const deliveredGroup = classGroup.filter((r) => r.entregue);
+
+      document.getElementById("kpi-all").textContent = classGroup.length;
+      document.getElementById("kpi-done").textContent = deliveredGroup.length;
+      document.getElementById("kpi-pending").textContent = classGroup.length - deliveredGroup.length;
+
+      if (deliveredGroup.length > 0) {
+        const avg = Math.round(
+          deliveredGroup.reduce((acc, r) => acc + (r.pm25_previsto || 0), 0) / deliveredGroup.length
+        );
+        document.getElementById("kpi-avg").textContent = `${avg} µg/m³`;
+      } else {
+        document.getElementById("kpi-avg").textContent = "-- µg/m³";
+      }
+
+      const rows = getFilteredRows();
+      const tbody = document.getElementById("student-rows");
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Nenhum aluno encontrado com esses filtros.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows
+        .map((r) => {
+          const dt = r.created_at
+            ? new Date(r.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" })
+            : "—";
+          return `
+            <tr>
+              <td><strong>${r.turma}</strong></td>
+              <td>${r.nome}</td>
+              <td><span class="pill ${r.entregue ? 'ok' : 'no'}">${r.entregue ? '✓ Entregue' : 'Pendente'}</span></td>
+              <td>${r.entregue ? `<strong>(06h, ${r.pm25_previsto} µg/m³)</strong>` : '—'}</td>
+              <td>${dt}</td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function exportCsv() {
+      const rows = getFilteredRows();
+      const lines = [
+        ["Turma", "Aluno", "Situacao", "Previsao_06h_PM25", "Entrega_Manaus"],
+        ...rows.map((r) => [
+          r.turma,
+          r.nome,
+          r.entregue ? "Entregue" : "Pendente",
+          r.entregue ? r.pm25_previsto : "",
+          r.created_at ? new Date(r.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" }) : ""
+        ])
+      ];
+      const csv =
+        "\uFEFF" +
+        lines.map((l) => l.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(";")).join("\r\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "relatorio-9ano-plano-cartesiano-pm25.csv";
+      a.click();
+    }
+
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("pm25_9ano_teacher_session"));
+      if (saved && saved.access_token) {
+        teacherSession = saved;
+        showDashboard();
+      }
+    } catch (e) {}
+  </script>
+</body>
 </html>
