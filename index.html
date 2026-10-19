@@ -1210,8 +1210,58 @@
         "PIETRO FERREIRA", "RENAN GOMES", "RENAN RAMOS", "SAMANTA VITORIA", "SAMILA HELOISA",
         "SARA CRISTINA", "SARA FERNANDA", "SARA VICTORIA", "SERGIO LUCAS", "THAYNNA RUANNE",
         "VITOR DANIEL", "NATANAEL MELHOR ALUNO"
+      ],
+      "2º T4": [
+        "AFONSO ENRIQUE", "ANA BEATRIZ", "ANA CLARA", "ANNE GABRIELE", "BRUNO MIGUEL",
+        "CAIO HENRIQUE", "CARLOS EDUARDO", "DANIEL VITOR", "DAVI LUCAS", "EDUARDO GABRIEL",
+        "EMANUELLY VITORIA", "ENZO GABRIEL", "FELIPE AUGUSTO", "GABRIEL HENRIQUE", "GIOVANNA LIMA",
+        "GUSTAVO HENRIQUE", "HELOISA VITORIA", "IGOR GABRIEL", "ISABELLA CRISTINA", "JOAO PEDRO",
+        "JOAO VICTOR", "JULIA BEATRIZ", "KAUA HENRIQUE", "LAURA BEATRIZ", "LETICIA GABRIELA",
+        "LUCAS GABRIEL", "LUIZ GUSTAVO", "MARIA CLARA", "MARIA EDUARDA", "MARIA FERNANDA",
+        "MARIA LUIZA", "MATHEUS HENRIQUE", "PEDRO HENRIQUE", "RAFAEL AUGUSTO", "SOPHIA VITORIA",
+        "THIAGO HENRIQUE", "VITOR HUGO", "YASMIN VITORIA", "NATANAEL MELHOR ALUNO"
+      ],
+      "3º T1": [
+        "ALESSANDRA LIMA", "ALEXANDRE SILVA", "AMANDA COSTA", "ANA CAROLINA", "ANDRE LUIZ",
+        "BEATRIZ ROCHA", "BRENDA KAROLINE", "BRUNO SOUZA", "CAMILA FERREIRA", "CAROLINA SANTOS",
+        "DANIEL OLIVEIRA", "DIEGO MARTINS", "EDUARDA ALMEIDA", "FERNANDA LOPES", "GABRIELA PEREIRA",
+        "GUSTAVO RIBEIRO", "HENRIQUE GOMES", "ISABELA CARVALHO", "JOAO VITOR", "JULIANA ARAUJO",
+        "LARISSA MENDES", "LEONARDO BARBOSA", "LETICIA CARDOSO", "LUCAS NASCIMENTO", "MARCELO TEIXEIRA",
+        "MARIANA MOREIRA", "MATHEUS CORREIA", "NATALIA DIAS", "PEDRO LUCAS", "RAFAELA MONTEIRO",
+        "RODRIGO FREITAS", "SABRINA VIEIRA", "THIAGO CASTRO", "VANESSA CAMPOS", "VINICIUS PINTO",
+        "NATANAEL MELHOR ALUNO"
+      ],
+      "3º T2": [
+        "ADRIANO MENDES", "ALINE BARROS", "ARTHUR GABRIEL", "BIANCA CAVALCANTE", "CAIO CESAR",
+        "CLARA NOGUEIRA", "DAVI EMANUEL", "DOUGLAS FARIAS", "ELISA MACHADO", "EMILLY SOARES",
+        "FABRICIO NEVES", "FLAVIA CUNHA", "GUILHERME AZEVEDO", "HELENA MOURA", "IGOR SANTANA",
+        "JESSICA PIRES", "JONATHAN BORGES", "KAMILA SIQUEIRA", "KEVIN MELO", "LORENA DUARTE",
+        "LUANA BATISTA", "MARCOS VINICIUS", "MAYARA GUIMARAES", "MILENA REIS", "NICOLAS XAVIER",
+        "OTAVIO BRAGA", "PATRICIA VIANA", "PAULO RICARDO", "PRISCILA MACEDO", "RENATO TAVARES",
+        "SAMUEL QUEIROZ", "TATIANE SALES", "VICTOR HUGO", "WESLEY ROCHA", "YURI MEDEIROS",
+        "NATANAEL MELHOR ALUNO"
       ]
     };
+
+    async function syncRostersFromSupabase() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/jacimar-fumaca-1910/entregas-publicas`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.alunos)) {
+            data.alunos.forEach((a) => {
+              if (!a.turma || !a.nome) return;
+              if (!ROSTERS[a.turma]) ROSTERS[a.turma] = [];
+              const cleanName = a.nome.trim().toUpperCase();
+              if (!ROSTERS[a.turma].includes(cleanName)) {
+                ROSTERS[a.turma].push(cleanName);
+              }
+            });
+            initTurmaUI();
+          }
+        }
+      } catch (e) {}
+    }
 
     let selectedLoginTurma = "";
     let selectedStudentName = "";
@@ -2327,6 +2377,7 @@
     window.addEventListener("hashchange", checkUrlHash);
 
     initTurmaUI();
+    syncRostersFromSupabase();
     checkUrlHash();
   </script>
 </body>
