@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Plano Cartesiano & Poluição em Manaus (PM 2,5) — Prof. Natanael</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-page: #f5f5f7;
+      --card-bg: #ffffff;
+      --text-main: #1d1d1f;
+      --text-secondary: #515154;
+      --text-muted: #86868b;
+      --brilliant-green: #2cc96b;
+      --brilliant-green-dark: #1fa352;
+      --brilliant-green-light: #e8fbf0;
+      --brilliant-dark: #191919;
+      --brilliant-blue: #2f6fed;
+      --brilliant-orange: #f59e0b;
+      --brilliant-red: #e53935;
+      --brilliant-red-light: #fef2f2;
+      --border-light: #e5e5ea;
+      --border-hover: #c7c7cc;
+      --shadow-card: 0 12px 34px -6px rgba(0, 0, 0, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+      --radius-card: 24px;
+      --radius-btn: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================================================================
+       BARRA SUPERIOR GLOBAL — 3 MÓDULOS:
+       [Atividade dos alunos] | [Painel do professor] | [Consulta de alunos e responsáveis]
+       ========================================================================= */
+    .platform-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-light);
+      position: sticky;
+      top: 0;
+      z-index: 120;
+    }
+
+    .platform-header-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .brand-logo-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--brilliant-dark);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.95rem;
+      position: relative;
+    }
+
+    .brand-logo-box::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--brilliant-green);
+      position: absolute;
+      top: 4px;
+      right: 4px;
+    }
+
+    .module-tabs {
+      display: flex;
+      gap: 6px;
+      background: #f0f0f5;
+      padding: 4px;
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+
+    .module-tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .module-tab-btn.active {
+      background: #ffffff;
+      color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+    }
+
+    /* =========================================================================
+       HUD DO BRILLIANT.ORG (BARRA SEGMENTADA DE 8 PÁGINAS — 1 POR VEZ)
+       ========================================================================= */
+    .brilliant-hud {
+      background: rgba(245, 245, 247, 0.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 12px 20px;
+      display: none;
+    }
+
+    .brilliant-hud.visible {
+      display: block;
+    }
+
+    .hud-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hud-back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-light);
+      background: #ffffff;
+      color: var(--text-main);
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .hud-back-btn:hover:not(:disabled) {
+      border-color: var(--text-main);
+      transform: translateX(-1px);
+    }
+
+    .hud-back-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .hud-segments {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+    }
+
+    .hud-seg {
+      height: 8px;
+      border-radius: 999px;
+      background: #dcdce2;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .hud-seg.done {
+      background: var(--brilliant-green);
+    }
+
+    .hud-seg.current {
+      background: #1d1d1f;
+      box-shadow: 0 0 0 2px rgba(29, 29, 31, 0.15);
+    }
+
+    .hud-student-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* =========================================================================
+       LAYOUT DE PÁGINA ÚNICA ESTILO BRILLIANT.ORG
+       ========================================================================= */
+    .view-section {
+      display: none;
+      flex: 1;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    .brilliant-stage {
+      max-width: 700px;
+      margin: 24px auto 130px;
+      padding: 0 16px;
+    }
+
+    .brilliant-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      animation: pageSlideIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes pageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--brilliant-blue);
+      background: #eef4ff;
+      padding: 4px 11px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .page-kicker.amber {
+      color: #b45309;
+      background: #fef3c7;
+    }
+
+    .page-kicker.emerald {
+      color: #0f6e36;
+      background: var(--brilliant-green-light);
+    }
+
+    .brilliant-card h1,
+    .brilliant-card h2 {
+      font-size: clamp(1.3rem, 2.8vw, 1.62rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .brilliant-card p.lead-text {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* =========================================================================
+       IDENTIFICAÇÃO DO ALUNO: SELECIONAR TURMA E DEPOIS O PRÓPRIO NOME
+       ========================================================================= */
+    .login-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field-label {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .turma-pills {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+
+    .turma-pill-btn {
+      padding: 13px 12px;
+      border-radius: 14px;
+      border: 2px solid var(--border-light);
+      background: #ffffff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+    }
+
+    .turma-pill-btn:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    .turma-pill-btn.selected {
+      border-color: var(--brilliant-green);
+      background: var(--brilliant-green-light);
+      color: #0b4f26;
+      box-shadow: 0 4px 12px rgba(44, 201, 107, 0.16);
+    }
+
+    .select-control,
+    .input-control {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 2px solid var(--border-light);
+      background: #ffffff;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .select-control:focus,
+    .input-control:focus {
+      border-color: var(--brilliant-dark);
+    }
+
+    .btn-brilliant-start {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 999px;
+      border: none;
+      background: var(--brilliant-dark);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 1.02rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .btn-brilliant-start:hover:not(:disabled) {
+      background: var(--brilliant-green-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-brilliant-start:disabled {
+      background: #d1d1d6;
+      cursor: not-allowed;
+    }
+
+    /* =========================================================================
+       COMPONENTE DO PLANO CARTESIANO INTERATIVO (1º QUADRANTE)
+       ========================================================================= */
+    .mission-call {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fffbeb;
+      border: 1.5px solid #fcd34d;
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #78350f;
+    }
+
+    .mission-call.done {
+      background: var(--brilliant-green-light);
+      border-color: var(--brilliant-green);
+      color: #0f5128;
+    }
+
+    .mission-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brilliant-orange);
+      flex-shrink: 0;
+    }
+
+    .mission-call.done .mission-dot {
+      background: var(--brilliant-green);
+    }
+
+    .chart-box {
+      background: #fbfbfd;
+      border: 1.5px solid var(--border-light);
+      border-radius: 18px;
+      padding: 14px 10px 8px;
+      user-select: none;
+      margin-bottom: 14px;
+    }
+
+    svg.cartesian-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+      cursor: crosshair;
+      touch-action: manipulation;
+    }
+
+    .grid-line {
+      stroke: #e5e5ea;
+      stroke-width: 1.2;
+      stroke-dasharray: 4 4;
+    }
+
+    .axis-line {
+      stroke: #1d1d1f;
+      stroke-width: 2.2;
+    }
+
+    .axis-label {
+      font-size: 12px;
+      font-weight: 700;
+      fill: #515154;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .axis-title {
+      font-size: 12px;
+      font-weight: 800;
+      fill: #1d1d1f;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .chart-segment {
+      stroke: var(--brilliant-blue);
+      stroke-width: 4;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    .chart-segment.evening {
+      stroke: #7c3aed;
+    }
+
+    .plotted-point {
+      fill: #ffffff;
+      stroke: var(--brilliant-blue);
+      stroke-width: 4;
+      r: 7;
+    }
+
+    .plotted-point.active-point {
+      stroke: var(--brilliant-green-dark);
+      fill: var(--brilliant-green);
+    }
+
+    .point-tag {
+      font-size: 12px;
+      font-weight: 800;
+      fill: #1d1d1f;
+    }
+
+    /* =========================================================================
+       ALTERNATIVAS ESTILO BRILLIANT.ORG (SELECIONAR -> BOTÃO VERIFICAR)
+       ========================================================================= */
+    .choices-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      margin-top: 8px;
+    }
+
+    .choice-card {
+      width: 100%;
+      text-align: left;
+      background: #ffffff;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-btn);
+      padding: 15px 18px;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      transition: all 0.16s ease;
+    }
+
+    .choice-card:hover:not(:disabled) {
+      border-color: var(--brilliant-green);
+      background: #f9fefb;
+    }
+
+    .choice-card.selected {
+      border-color: var(--brilliant-dark);
+      background: #f4f4f6;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .choice-card.correct {
+      border-color: var(--brilliant-green);
+      background: var(--brilliant-green-light);
+      color: #0d4a25;
+    }
+
+    .choice-card.wrong {
+      border-color: var(--brilliant-red);
+      background: var(--brilliant-red-light);
+      color: #8c1d1d;
+    }
+
+    .choice-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid #d1d1d6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .choice-card.selected .choice-letter {
+      background: var(--brilliant-dark);
+      border-color: var(--brilliant-dark);
+      color: #ffffff;
+    }
+
+    .choice-card.correct .choice-letter {
+      background: var(--brilliant-green);
+      border-color: var(--brilliant-green);
+      color: #ffffff;
+    }
+
+    .choice-card.wrong .choice-letter {
+      background: var(--brilliant-red);
+      border-color: var(--brilliant-red);
+      color: #ffffff;
+    }
+
+    .page-action-row {
+      margin-top: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-check {
+      padding: 13px 28px;
+      border-radius: 999px;
+      border: none;
+      background: var(--brilliant-dark);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.96rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .btn-check:hover:not(:disabled) {
+      background: #333336;
+      transform: translateY(-1px);
+    }
+
+    .btn-check:disabled {
+      background: #dcdce2;
+      color: #8e8e93;
+      cursor: not-allowed;
+    }
+
+    /* =========================================================================
+       DRAWER INFERIOR DE FEEDBACK DO BRILLIANT.ORG (SLIDE-UP TRAY)
+       ========================================================================= */
+    .brilliant-bottom-tray {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 150;
+      transform: translateY(105%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 18px 20px;
+      border-top: 2px solid var(--border-light);
+      background: #ffffff;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .brilliant-bottom-tray.open {
+      transform: translateY(0);
+    }
+
+    .brilliant-bottom-tray.tray-success {
+      background: #eefdf4;
+      border-top-color: var(--brilliant-green);
+    }
+
+    .brilliant-bottom-tray.tray-error {
+      background: #fff5f5;
+      border-top-color: var(--brilliant-red);
+    }
+
+    .tray-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .tray-content {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .tray-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .tray-success .tray-title {
+      color: #0d5c2d;
+    }
+
+    .tray-error .tray-title {
+      color: #991b1b;
+    }
+
+    .tray-desc {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+    }
+
+    .btn-tray-continue {
+      padding: 14px 30px;
+      border-radius: 999px;
+      border: none;
+      background: var(--brilliant-green);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(44, 201, 107, 0.35);
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .btn-tray-continue:hover {
+      background: var(--brilliant-green-dark);
+      transform: translateY(-1px);
+    }
+
+    .tray-error .btn-tray-continue {
+      background: var(--brilliant-red);
+      box-shadow: none;
+    }
+
+    /* =========================================================================
+       SIMULADOR INTERATIVO DE INVERSÃO TÉRMICA (PÁGINA 7)
+       ========================================================================= */
+    .sim-stage {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      margin-bottom: 16px;
+      transition: background 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .sim-sky-label {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      z-index: 5;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .sim-sun-moon {
+      position: absolute;
+      right: 26px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      transition: all 0.25s ease;
+      z-index: 2;
+    }
+
+    .sim-smoke-layer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 105px;
+      background: radial-gradient(ellipse at center, rgba(95, 102, 114, 0.9) 0%, rgba(120, 126, 138, 0.72) 60%, rgba(148, 163, 184, 0) 100%);
+      filter: blur(5px);
+      transition: top 0.2s ease, opacity 0.2s ease;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .smoke-badge {
+      background: rgba(29, 29, 31, 0.82);
+      color: #fff;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .sim-city-floor {
+      position: relative;
+      z-index: 4;
+      height: 50px;
+      background: #1e293b;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 20px;
+    }
+
+    .building {
+      background: #334155;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .slider-box {
+      background: #f8fafc;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid var(--border-light);
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    input[type="range"].brilliant-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #64748b 0%, #f59e0b 50%, #475569 100%);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"].brilliant-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 4px solid var(--brilliant-green);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.22);
+      cursor: grab;
+    }
+
+    /* =========================================================================
+       PAINEL DO PROFESSOR & CONSULTA DE ALUNOS E RESPONSÁVEIS
+       ========================================================================= */
+    .dashboard-wrap {
+      max-width: 1020px;
+      margin: 28px auto 80px;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      background: #ffffff;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    table.data-table th,
+    table.data-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    table.data-table th {
+      background: #f8fafc;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .status-pill.ok {
+      background: var(--brilliant-green-light);
+      color: #0d5c2d;
+    }
+
+    .status-pill.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @media (max-width: 640px) {
+      .brilliant-card {
+        padding: 22px 16px;
+      }
+      .hud-student-pill {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- =========================================================================
+       BARRA DE MÓDULOS DA PLATAFORMA (terceiroremota14)
+       ========================================================================= -->
+  <header class="platform-header">
+    <div class="platform-header-inner">
+      <div class="brand-identity">
+        <div class="brand-logo-box">B</div>
+        <div>
+          <div>Prof. Natanael • Plano Cartesiano & PM 2,5</div>
+          <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted);">
+            Manaus, AM • Conectado ao Supabase (terceiroremota14)
+          </div>
+        </div>
+      </div>
+
+      <nav class="module-tabs" aria-label="Módulos da Plataforma">
+        <button class="module-tab-btn active" id="tab-btn-aluno" onclick="switchPlatformModule('aluno')">
+          Atividade dos alunos
+        </button>
+        <button class="module-tab-btn" id="tab-btn-professor" onclick="switchPlatformModule('professor')">
+          Painel do professor
+        </button>
+        <button class="module-tab-btn" id="tab-btn-consulta" onclick="switchPlatformModule('consulta')">
+          Consulta de alunos e responsáveis
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MÓDULO 1: [ATIVIDADE DOS ALUNOS] — 1 PÁGINA POR INTERATIVIDADE (BRILLIANT)
+       ========================================================================= -->
+  <div class="view-section active" id="module-aluno">
+
+    <!-- HUD de Progresso do Aluno (8 etapas segmentadas estilo Brilliant.org) -->
+    <div class="brilliant-hud" id="brilliant-hud">
+      <div class="hud-inner">
+        <button class="hud-back-btn" id="hud-prev-btn" onclick="goPrevPage()" title="Voltar etapa">
+          ←
+        </button>
+        <div class="hud-segments" id="hud-segments"></div>
+        <div class="hud-student-pill" id="hud-student-pill">9º Ano</div>
+      </div>
+    </div>
+
+    <main class="brilliant-stage">
+      <!-- TELA DE ENTRADA: SELECIONAR A TURMA E DEPOIS O PRÓPRIO NOME -->
+      <section class="brilliant-card" id="student-login-card">
+        <span class="page-kicker emerald">📍 Manaus, AM • 9º Ano Matemática</span>
+        <h1>A Curva da Fumaça (PM 2,5) no Plano Cartesiano</h1>
+        <p class="lead-text">
+          Para iniciar sua atividade interativa (1 desafio por tela no estilo <strong>Brilliant.org</strong>), selecione primeiro a sua <strong>turma</strong> e depois o seu <strong>próprio nome</strong> na chamada:
+        </p>
+
+        <div class="login-grid">
+          <div class="field-group">
+            <label class="field-label">1. Selecione a sua Turma:</label>
+            <div class="turma-pills" id="login-turma-pills"></div>
+          </div>
+
+          <div class="field-group" id="login-name-group" style="opacity: 0.45; pointer-events: none;">
+            <label class="field-label" for="login-student-select">2. Selecione o seu Nome na chamada:</label>
+            <select class="select-control" id="login-student-select" onchange="onSelectStudentName()">
+              <option value="">Primeiro selecione a turma acima...</option>
+            </select>
+          </div>
+
+          <div class="field-group" id="login-custom-name-group" style="display: none;">
+            <label class="field-label" for="login-custom-name-input">Digite seu nome completo:</label>
+            <input
+              type="text"
+              id="login-custom-name-input"
+              class="input-control"
+              placeholder="Digite seu nome completo"
+              oninput="validateLoginReady()"
+            />
+          </div>
+
+          <button class="btn-brilliant-start" id="btn-start-lesson" disabled onclick="startBrilliantLesson()">
+            Entrar na Atividade Interativa →
+          </button>
+        </div>
+      </section>
+
+      <!-- CONTAINER DE PÁGINA ÚNICA (UMA PÁGINA PARA CADA INTERATIVIDADE) -->
+      <section class="brilliant-card" id="lesson-page-card" style="display: none;">
+        <div id="lesson-page-body"></div>
+      </section>
+    </main>
+
+    <!-- DRAWER DESLIZANTE INFERIOR DE FEEDBACK (BRILLIANT.ORG) -->
+    <div class="brilliant-bottom-tray" id="brilliant-tray">
+      <div class="tray-inner">
+        <div class="tray-content">
+          <div class="tray-title" id="tray-title">Excelente!</div>
+          <div class="tray-desc" id="tray-desc">Explicação matemática aqui.</div>
+        </div>
+        <button class="btn-tray-continue" id="tray-btn" onclick="onTrayButtonClick()">
+          Continuar →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MÓDULO 2: [PAINEL DO PROFESSOR]
+       ========================================================================= -->
+  <div class="view-section" id="module-professor">
+    <div class="dashboard-wrap">
+      <div class="brilliant-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <span class="page-kicker">📊 Painel do Professor • terceiroremota14</span>
+            <h2>Acompanhamento de Entregas e Previsões (PM 2,5)</h2>
+            <p class="lead-text" style="margin-bottom: 0;">
+              Conectado a <code>https://bxvuqwnmqooxaoexnjty.supabase.co</code> na tabela exclusiva <code>previsoes_pm25_9ano</code> (nenhum projeto ou tabela anterior é alterado).
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <select class="select-control" id="prof-filter-turma" style="width: auto; padding: 10px 14px;" onchange="loadTeacherDashboard()">
+              <option value="TODAS">Todas as Turmas</option>
+            </select>
+            <button class="btn-check" onclick="loadTeacherDashboard()">🔄 Atualizar Agora</button>
+            <button class="btn-check" style="background: var(--brilliant-green-dark);" onclick="exportTeacherCsv()">📥 Baixar CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Entregas Confirmadas</div>
+          <div class="kpi-value" id="kpi-total">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Média Previsão 06h (Pós-Chuva)</div>
+          <div class="kpi-value" id="kpi-avg-pm25">-- µg/m³</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Previram Ar Mais Limpo (&lt; 160)</div>
+          <div class="kpi-value" id="kpi-rain-effect">--%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Tabela no Supabase</div>
+          <div class="kpi-value" style="font-size: 1rem; color: var(--brilliant-green-dark); margin-top: 8px;">
+            previsoes_pm25_9ano
+          </div>
+        </div>
+      </div>
+
+      <div class="brilliant-card">
+        <h2 style="margin-bottom: 14px;">Registros por Aluno</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Horário (Manaus)</th>
+                <th>Turma</th>
+                <th>Nome do Aluno</th>
+                <th>Chute Final (06h)</th>
+                <th>Progresso</th>
+                <th>Situação</th>
+              </tr>
+            </thead>
+            <tbody id="prof-table-body">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted);">Carregando...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MÓDULO 3: [CONSULTA DE ALUNOS E RESPONSÁVEIS]
+       ========================================================================= -->
+  <div class="view-section" id="module-consulta">
+    <div class="brilliant-stage">
+      <section class="brilliant-card">
+        <span class="page-kicker emerald">👨‍👩‍👧 Consulta Pública de Entrega</span>
+        <h2>Consulta de Alunos e Responsáveis</h2>
+        <p class="lead-text">
+          Selecione a <strong>turma</strong> e depois o <strong>próprio nome</strong> para verificar imediatamente o status de entrega da atividade de Matemática (Plano Cartesiano & Poluição do Ar em Manaus).
+        </p>
+
+        <div class="login-grid">
+          <div class="field-group">
+            <label class="field-label">1. Selecione a Turma:</label>
+            <div class="turma-pills" id="consulta-turma-pills"></div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="consulta-student-select">2. Selecione o Nome do Aluno:</label>
+            <select class="select-control" id="consulta-student-select" onchange="runParentStudentLookup()">
+              <option value="">Escolha uma turma acima...</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="consulta-result-box" style="margin-top: 24px; display: none;"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. CONFIGURAÇÃO OFICIAL DO SUPABASE (PROJETO terceiroremota14)
+          URL: https://bxvuqwnmqooxaoexnjty.supabase.co
+          Tabela exclusiva: previsoes_pm25_9ano
+       ========================================================================= */
+    const SUPABASE_URL = "https://bxvuqwnmqooxaoexnjty.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_gv_lK9K2hrReKQvC-5Ou7Q_vI9c1NwI";
+    const SUPABASE_TABLE = "previsoes_pm25_9ano";
+
+    let supabaseClient = null;
+    try {
+      if (window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { persistSession: false, autoRefreshToken: false }
+        });
+      }
+    } catch (err) {
+      console.warn("Aviso ao iniciar cliente Supabase:", err);
+    }
+
+    /* =========================================================================
+       2. CHAMADA OFICIAL DE ALUNOS POR TURMA (9º ANO + TURMAS DO BANCO)
+          - Já inclui todos os nomes oficiais das suas turmas de 9º Ano (9º 1, 9º 2, 9º 4)
+            e também das turmas de Ensino Médio caso queira usar, além de consultar o banco!
+       ========================================================================= */
+    const ROSTERS = {
+      "9º 1": [
+        "ALICE LIMA", "ANA BEATRIZ", "ANA CLARA DA CRUZ", "ARTHUR MATHEUS", "ARTHUR VINICIUS",
+        "BRENDA LOHANY", "CALEBE MENDES", "EMANUELY MARIA", "FERNANDA DUARTE", "GUILHERME CARDOSO",
+        "HELOISA SAMPAIO", "ISABELA LOUISE", "ISABELLA MACEDO", "JAMILLE ESTEFANY", "JASMIM DA SILVA",
+        "JOAO GUILHERME", "JOSE HENRIQUE MOURA", "JULIANY ROCHA", "KEVEN GUILHERME", "LAURA SOPHYA",
+        "LAYANE KAROLINE", "LORRANA GABRIELLY", "LUCAS MAZETTI", "MARIA ALICE", "MARIA EDUARDA LACERDA",
+        "MARIA EDUARDA LIMA", "MATEUS HENRIQUE", "MELISSA PAULA", "PEDRO GENTIL", "PEDRO HENRIQUE",
+        "PEDRO IGOR", "PERICLES DANIEL", "RAONI FERREIRA", "RENATO GABRIEL", "SIDNEY SOUZA",
+        "YASMIM BATISTA", "NATANAEL MELHOR ALUNO"
+      ],
+      "9º 2": [
+        "ANA CLAYRE", "ANA VITORIA", "ANNE BEATRIZ", "BREENDO RIBEIRO", "DANILO CAUE",
+        "DYEGO MELO", "EMANUELY VITORIA", "GLENDA LARISSA", "GUSTAVO ARMSTRONG", "JHESSICA ALMEIDA",
+        "JOAO CARLOS", "JOAO PEDRO", "JOAO VITOR", "JOSUE RAFAEL", "JULIA OLIVEIRA",
+        "JULIANA SILVA", "KAUA GABRIEL", "KAYO ADRIANO", "LARA RUANA", "LETICIA TAVARES",
+        "MARCO ANTONIO", "MARINA ALICE", "MELYSSA GLENDIANE", "MIKAELLY ALVES", "NIVALDO RODRIGUES",
+        "PEDRO MESQUITA", "PEDRO VICTOR", "RAICCA GABRIELLE", "RAQUEL GAMA", "RENAN MATHEUS",
+        "SALOMAO GOMES", "SELMA KAUANY", "SOPHIA PINHEIRO", "SOPHIA SILVA", "VICTOR GABRIEL",
+        "YASMIN VITORIA", "NATANAEL MELHOR ALUNO"
+      ],
+      "9º 4": [
+        "ALEXSANDER DE OLIVEIRA", "ANA JULIA", "ANGELO GABRIEL", "ANNE BEATRICE", "ASAFE RHYETRO",
+        "BRISA LOHAINY", "CARLOS EDUARDO", "DAVI OLIVEIRA", "EMILLY FERNANDA", "ERIKE LUIZ",
+        "FABIO GONCALVES", "FERNANDO NASCIMENTO", "GUILHERME DA SILVA", "GUILHERME VALE", "ISMAEL GOMES",
+        "JHON ANDREW", "JOSE VICTOR", "JOSUE NICHOLLAS", "KAUA CANTUARIO", "LUIZ FABIANO",
+        "MANUELA SILVA", "MARIA EDUARDA", "MAYSA PYETRA", "NATHANAEL DUTRA", "PAULO SAMUEL",
+        "PIETRO FERREIRA", "RENAN GOMES", "RENAN RAMOS", "SAMANTA VITORIA", "SAMILA HELOISA",
+        "SARA CRISTINA", "SARA FERNANDA", "SARA VICTORIA", "SERGIO LUCAS", "THAYNNA RUANNE",
+        "VITOR DANIEL", "NATANAEL MELHOR ALUNO"
+      ]
+    };
+
+    let selectedLoginTurma = "";
+    let selectedStudentName = "";
+    let selectedConsultaTurma = "";
+
+    function initTurmaUI() {
+      const turmas = Object.keys(ROSTERS);
+
+      // Botões de turma na tela de entrada do aluno
+      document.getElementById("login-turma-pills").innerHTML = turmas
+        .map(
+          (t) => `
+          <button type="button" class="turma-pill-btn ${selectedLoginTurma === t ? 'selected' : ''}"
+                  onclick="selectTurmaForLogin('${t}')">
+            Turma ${t}
+          </button>
+        `
+        )
+        .join("");
+
+      // Botões de turma na aba de consulta de alunos e responsáveis
+      document.getElementById("consulta-turma-pills").innerHTML = turmas
+        .map(
+          (t) => `
+          <button type="button" class="turma-pill-btn ${selectedConsultaTurma === t ? 'selected' : ''}"
+                  onclick="selectTurmaForConsulta('${t}')">
+            Turma ${t}
+          </button>
+        `
+        )
+        .join("");
+
+      // Filtro do professor
+      document.getElementById("prof-filter-turma").innerHTML =
+        `<option value="TODAS">Todas as Turmas</option>` +
+        turmas.map((t) => `<option value="${t}">Turma ${t}</option>`).join("");
+    }
+
+    function selectTurmaForLogin(turma) {
+      selectedLoginTurma = turma;
+      initTurmaUI();
+
+      const names = ROSTERS[turma] || [];
+      const group = document.getElementById("login-name-group");
+      const sel = document.getElementById("login-student-select");
+
+      group.style.opacity = "1";
+      group.style.pointerEvents = "auto";
+
+      sel.innerHTML =
+        `<option value="">-- Selecione seu nome (${turma}) --</option>` +
+        names.map((n) => `<option value="${n}">${n}</option>`).join("") +
+        `<option value="__OUTRO__">➕ Outro nome (Digitar manualmente)</option>`;
+
+      document.getElementById("login-custom-name-group").style.display = "none";
+      validateLoginReady();
+    }
+
+    function onSelectStudentName() {
+      const val = document.getElementById("login-student-select").value;
+      const customBox = document.getElementById("login-custom-name-group");
+      if (val === "__OUTRO__") {
+        customBox.style.display = "flex";
+        document.getElementById("login-custom-name-input").focus();
+      } else {
+        customBox.style.display = "none";
+      }
+      validateLoginReady();
+    }
+
+    function validateLoginReady() {
+      const selVal = document.getElementById("login-student-select").value;
+      const customVal = document.getElementById("login-custom-name-input").value.trim().toUpperCase();
+      const finalName = selVal === "__OUTRO__" ? customVal : selVal;
+
+      selectedStudentName = finalName;
+      document.getElementById("btn-start-lesson").disabled = !(selectedLoginTurma && finalName.length >= 2);
+    }
+
+    /* =========================================================================
+       3. DINÂMICA BRILLIANT.ORG: UMA PÁGINA PARA CADA INTERATIVIDADE (PÁGINAS 1 A 8)
+       ========================================================================= */
+    const TOTAL_PAGES = 8;
+    const lessonState = {
+      currentPage: 1,
+      pageCompleted: { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false },
+      p1_A: false,
+      p1_B: false,
+      selectedChoice: { 2: null, 3: null, 5: null },
+      simTouchedMid: false,
+      simTouchedEnd: false,
+      predictedY: null
+    };
+
+    function startBrilliantLesson() {
+      document.getElementById("student-login-card").style.display = "none";
+      document.getElementById("lesson-page-card").style.display = "block";
+      document.getElementById("brilliant-hud").classList.add("visible");
+      document.getElementById("hud-student-pill").textContent = `${selectedLoginTurma} • ${selectedStudentName}`;
+      renderCurrentBrilliantPage();
+    }
+
+    function renderHudSegments() {
+      const container = document.getElementById("hud-segments");
+      let html = "";
+      for (let i = 1; i <= TOTAL_PAGES; i++) {
+        let cls = "hud-seg";
+        if (lessonState.pageCompleted[i]) cls += " done";
+        if (i === lessonState.currentPage) cls += " current";
+        html += `<div class="${cls}"></div>`;
+      }
+      container.innerHTML = html;
+      document.getElementById("hud-prev-btn").disabled = lessonState.currentPage <= 1;
+    }
+
+    function goPrevPage() {
+      if (lessonState.currentPage > 1) {
+        closeFeedbackTray();
+        lessonState.currentPage--;
+        renderCurrentBrilliantPage();
+      }
+    }
+
+    function goNextPage() {
+      closeFeedbackTray();
+      if (lessonState.currentPage < TOTAL_PAGES) {
+        lessonState.currentPage++;
+        renderCurrentBrilliantPage();
+      }
+    }
+
+    function renderCurrentBrilliantPage() {
+      renderHudSegments();
+      const card = document.getElementById("lesson-page-card");
+      card.style.animation = "none";
+      void card.offsetWidth;
+      card.style.animation = "pageSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+
+      const body = document.getElementById("lesson-page-body");
+      const p = lessonState.currentPage;
+
+      if (p === 1) {
+        body.innerHTML = `
+          <span class="page-kicker amber">Interatividade 1 de 8 • Plano Cartesiano (1º Quadrante)</span>
+          <h2>1. Construindo a Reta da Manhã até a Tarde</h2>
+          <p class="lead-text">
+            Clique no gráfico para plotar o <strong>Ponto A (06h, 160)</strong> e o <strong>Ponto B (14h, 40)</strong>. Uma reta conectando-os surgirá automaticamente!
+          </p>
+          <div class="mission-call ${lessonState.pageCompleted[1] ? 'done' : ''}">
+            <span class="mission-dot"></span>
+            <span>
+              ${
+                lessonState.pageCompleted[1]
+                  ? "✓ Pontos A (06h, 160) e B (14h, 40) marcados com sucesso!"
+                  : "Toque/clique nas interseções (06h, 160) e (14h, 40) do gráfico."
+              }
+            </span>
+          </div>
+          ${getCartesianSvgMarkup("interactive-p1")}
+        `;
+        setupCartesianChart("interactive-p1");
+        if (lessonState.pageCompleted[1]) {
+          openFeedbackTray(
+            true,
+            "Reta AB desenhada!",
+            "Às 06h tínhamos 160 µg/m³ e às 14h caiu para 40 µg/m³. Vamos analisar essa tendência!",
+            "Continuar →"
+          );
+        }
+      } else if (p === 2) {
+        body.innerHTML = `
+          <span class="page-kicker">Interatividade 2 de 8 • Questão 1 (Análise de Tendência)</span>
+          <h2>Observando a reta desenhada, a concentração de PM 2,5 é:</h2>
+          <p class="lead-text">
+            Analise o comportamento da linha azul entre as 06h e as 14h no gráfico abaixo:
+          </p>
+          ${getCartesianSvgMarkup("readonly-AB")}
+          <div class="choices-stack">
+            <button class="choice-card" id="choice-2-0" onclick="selectChoice(2, 0)">
+              <span>Crescente (aumenta com o sol)</span>
+              <span class="choice-letter">A</span>
+            </button>
+            <button class="choice-card" id="choice-2-1" onclick="selectChoice(2, 1)">
+              <span>Decrescente (o ar limpa à medida que a tarde chega)</span>
+              <span class="choice-letter">B</span>
+            </button>
+          </div>
+          <div class="page-action-row">
+            <button class="btn-check" id="btn-check-2" disabled onclick="verifyChoiceQuestion(2, 1)">
+              Verificar
+            </button>
+          </div>
+        `;
+        setupCartesianChart("readonly-AB");
+        restoreCompletedQuizState(2, 1);
+      } else if (p === 3) {
+        body.innerHTML = `
+          <span class="page-kicker">Interatividade 3 de 8 • Questão 2 (Leitura de Coordenadas)</span>
+          <h2>Qual é o par ordenado $(x, y)$ que representa o momento em que o ar de Manaus estava mais limpo neste período?</h2>
+          <p class="lead-text">
+            Lembre-se: em $(x, y)$, a primeira coordenada vem do eixo horizontal (Tempo) e a segunda do eixo vertical (PM 2,5).
+          </p>
+          ${getCartesianSvgMarkup("readonly-AB")}
+          <div class="choices-stack">
+            <button class="choice-card" id="choice-3-0" onclick="selectChoice(3, 0)">
+              <span>(06h, 160)</span>
+              <span class="choice-letter">A</span>
+            </button>
+            <button class="choice-card" id="choice-3-1" onclick="selectChoice(3, 1)">
+              <span>(40, 14h)</span>
+              <span class="choice-letter">B</span>
+            </button>
+            <button class="choice-card" id="choice-3-2" onclick="selectChoice(3, 2)">
+              <span>(14h, 40)</span>
+              <span class="choice-letter">C</span>
+            </button>
+          </div>
+          <div class="page-action-row">
+            <button class="btn-check" id="btn-check-3" disabled onclick="verifyChoiceQuestion(3, 2)">
+              Verificar
+            </button>
+          </div>
+        `;
+        setupCartesianChart("readonly-AB");
+        restoreCompletedQuizState(3, 2);
+      } else if (p === 4) {
+        body.innerHTML = `
+          <span class="page-kicker amber">Interatividade 4 de 8 • Questão 3 (Ponto Intermediário)</span>
+          <h2>Plotando o Ponto C (10h, 120)</h2>
+          <p class="lead-text">
+            Ao analisar os sensores, descobrimos que às <strong>10h da manhã</strong> o nível de PM 2,5 estava em <strong>120</strong>.
+            Clique no gráfico para plotar exatamente o <strong>Ponto C (10h, 120)</strong>.
+          </p>
+          <div class="mission-call ${lessonState.pageCompleted[4] ? 'done' : ''}">
+            <span class="mission-dot"></span>
+            <span>
+              ${
+                lessonState.pageCompleted[4]
+                  ? "✓ Ponto C (10h, 120) plotado no gráfico!"
+                  : "Clique exatamente na interseção de 10h (Eixo X) com 120 (Eixo Y)."
+              }
+            </span>
+          </div>
+          ${getCartesianSvgMarkup("interactive-p4")}
+        `;
+        setupCartesianChart("interactive-p4");
+        if (lessonState.pageCompleted[4]) {
+          openFeedbackTray(
+            true,
+            "Ponto C (10h, 120) marcado!",
+            "Agora temos a reta ligando C(10h, 120) até B(14h, 40). Vamos usar isso na próxima página!",
+            "Continuar →"
+          );
+        }
+      } else if (p === 5) {
+        body.innerHTML = `
+          <span class="page-kicker">Interatividade 5 de 8 • Questão 4 (Interpolação Visual)</span>
+          <h2>Qual era a concentração exata de PM 2,5 ao meio-dia (12h)?</h2>
+          <p class="lead-text">
+            O gráfico mostra uma queda constante entre as <strong>10h (120 µg/m³)</strong> e as <strong>14h (40 µg/m³)</strong>. Olhando para a reta que liga esses dois pontos, qual era a concentração exata ao <strong>meio-dia (12h)</strong>?
+          </p>
+          ${getCartesianSvgMarkup("readonly-ACB")}
+          <div class="choices-stack">
+            <button class="choice-card" id="choice-5-0" onclick="selectChoice(5, 0)">
+              <span>60 µg/m³</span>
+              <span class="choice-letter">A</span>
+            </button>
+            <button class="choice-card" id="choice-5-1" onclick="selectChoice(5, 1)">
+              <span>80 µg/m³</span>
+              <span class="choice-letter">B</span>
+            </button>
+            <button class="choice-card" id="choice-5-2" onclick="selectChoice(5, 2)">
+              <span>100 µg/m³</span>
+              <span class="choice-letter">C</span>
+            </button>
+          </div>
+          <div class="page-action-row">
+            <button class="btn-check" id="btn-check-5" disabled onclick="verifyChoiceQuestion(5, 1)">
+              Verificar
+            </button>
+          </div>
+        `;
+        setupCartesianChart("readonly-ACB");
+        restoreCompletedQuizState(5, 1);
+      } else if (p === 6) {
+        body.innerHTML = `
+          <span class="page-kicker amber">Interatividade 6 de 8 • Questão 5 (Inversão Térmica da Noite)</span>
+          <h2>Completando a Curva às 18h</h2>
+          <p class="lead-text">
+            No final da tarde, o sol se põe, o chão esfria e a fumaça volta a ficar presa em Manaus. Às <strong>18h</strong>, a concentração voltou a subir para o nível de <strong>120</strong>.
+            Clique no gráfico e marque o <strong>Ponto D (18h, 120)</strong> para completar nossa curva!
+          </p>
+          <div class="mission-call ${lessonState.pageCompleted[6] ? 'done' : ''}">
+            <span class="mission-dot"></span>
+            <span>
+              ${
+                lessonState.pageCompleted[6]
+                  ? "✓ Ponto D (18h, 120) marcado! A linha subiu de B(14h, 40) para D(18h, 120)."
+                  : "Clique na coordenada D (18h, 120) no gráfico abaixo."
+              }
+            </span>
+          </div>
+          ${getCartesianSvgMarkup("interactive-p6")}
+        `;
+        setupCartesianChart("interactive-p6");
+        if (lessonState.pageCompleted[6]) {
+          openFeedbackTray(
+            true,
+            "Curva de Inversão Térmica completa!",
+            "Veja como a linha desce até as 14h e depois sobe às 18h. Vamos simular o fenômeno físico na próxima página!",
+            "Continuar →"
+          );
+        }
+      } else if (p === 7) {
+        body.innerHTML = `
+          <span class="page-kicker emerald">Interatividade 7 de 8 • Simulação Interativa</span>
+          <h2>Por que a linha desce e depois sobe?</h2>
+          <p class="lead-text">
+            Arraste o controle deslizante de temperatura do dia (<strong>Frio → Quente → Frio</strong>) e veja o que acontece com a camada de fumaça sobre Manaus:
+          </p>
+
+          <div class="sim-stage" id="sim-stage" style="background: linear-gradient(180deg, #1e293b 0%, #475569 100%);">
+            <div class="sim-sky-label" id="sim-status-label">❄️ Manhã Fria (06h) • Fumaça Presa (160 µg/m³)</div>
+            <div class="sim-sun-moon" id="sim-celestial" style="top: 62px; background: #fef08a; box-shadow: 0 0 20px rgba(254, 240, 138, 0.5);"></div>
+            <div class="sim-smoke-layer" id="sim-smoke" style="top: 95px; opacity: 0.92;">
+              <span class="smoke-badge" id="smoke-badge-text">Camada densa de PM 2,5 presa na cidade</span>
+            </div>
+            <div class="sim-city-floor">
+              <div class="building" style="width: 28px; height: 34px;"></div>
+              <div class="building" style="width: 38px; height: 46px;"></div>
+              <div class="building" style="width: 24px; height: 26px;"></div>
+              <div class="building" style="width: 44px; height: 40px;"></div>
+              <div class="building" style="width: 32px; height: 48px;"></div>
+              <div class="building" style="width: 26px; height: 30px;"></div>
+              <div class="building" style="width: 40px; height: 42px;"></div>
+            </div>
+          </div>
+
+          <div class="slider-box">
+            <div class="slider-labels">
+              <span>❄️ Frio (Madrugada/06h)</span>
+              <span>☀️ Quente (Tarde/14h)</span>
+              <span>🌙 Frio (Noite/18h)</span>
+            </div>
+            <input type="range" min="0" max="100" value="0" class="brilliant-slider"
+                   oninput="handleBrilliantSimSlider(this.value)" />
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); margin-top: 12px; text-align: center;">
+            👆 Passe pelo meio (Quente/Tarde) e leve até o fim (Frio/Noite) para avançar ao Desafio Final!
+          </p>
+        `;
+        if (lessonState.pageCompleted[7]) {
+          openFeedbackTray(
+            true,
+            "Inversão Térmica Dominada!",
+            "No calor da tarde o ar quente sobe e limpa o céu. À noite e de madrugada o ar frio prende a fumaça.",
+            "Ir para a Previsão Empírica →"
+          );
+        }
+      } else if (p === 8) {
+        body.innerHTML = `
+          <span class="page-kicker emerald">Interatividade 8 de 8 • A Previsão Empírica (Salvando no Supabase)</span>
+          <h2>Onde o Ponto de amanhã às 06h vai nascer?</h2>
+          <p class="lead-text">
+            🌧️ <strong>Ontem choveu forte em Manaus!</strong> A chuva "lava" as partículas PM 2,5 do ar.
+            Baseado nessa observação empírica de hoje (em que às 06h sem chuva tínhamos <strong>160 µg/m³</strong>), clique no gráfico no <strong>eixo de 06h</strong> para marcar onde você acha que o <strong>Ponto de amanhã às 06h</strong> vai nascer!
+          </p>
+          <div class="mission-call ${lessonState.pageCompleted[8] ? 'done' : ''}">
+            <span class="mission-dot"></span>
+            <span>
+              ${
+                lessonState.pageCompleted[8]
+                  ? `✓ Chute Final registrado: (06h, ${lessonState.predictedY} µg/m³)!`
+                  : "Clique na primeira linha vertical (06h) na altura Y que representa sua previsão."
+              }
+            </span>
+          </div>
+          ${getCartesianSvgMarkup("interactive-p8")}
+          <div id="final-celebration-banner" style="display: none; margin-top: 18px; padding: 24px; border-radius: 20px; background: var(--brilliant-green-light); border: 2px solid var(--brilliant-green); text-align: center;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--brilliant-green); color: #fff; font-size: 2rem; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">✓</div>
+            <h3 style="font-size: 1.3rem; font-weight: 800; color: #0b4f26;">Parabéns, ${selectedStudentName}!</h3>
+            <p style="font-size: 0.95rem; color: #134e2a; margin-top: 6px;" id="final-sync-msg">
+              Enviando sua previsão para o banco de dados do Prof. Natanael...
+            </p>
+          </div>
+        `;
+        setupCartesianChart("interactive-p8");
+        if (lessonState.pageCompleted[8]) {
+          document.getElementById("final-celebration-banner").style.display = "block";
+          document.getElementById("final-sync-msg").innerHTML =
+            `✅ Previsão <strong>(06h, ${lessonState.predictedY} µg/m³)</strong> registrada com sucesso para <strong>${selectedStudentName} (Turma ${selectedLoginTurma})</strong>!`;
+        }
+      }
+    }
+
+    /* =========================================================================
+       4. PLANO CARTESIANO SVG (MARCAÇÕES EXATAS DE Y: 0, 40, 80, 120, 160, 200)
+       ========================================================================= */
+    const X_LABELS = ["06h", "08h", "10h", "12h", "14h", "16h", "18h", "20h"];
+    const Y_VALUES = [0, 40, 80, 120, 160, 200];
+
+    const CHART_BOX = {
+      marginLeft: 70,
+      marginRight: 32,
+      marginTop: 26,
+      marginBottom: 52,
+      width: 660,
+      height: 350
+    };
+    const PLOT_W = CHART_BOX.width - CHART_BOX.marginLeft - CHART_BOX.marginRight;
+    const PLOT_H = CHART_BOX.height - CHART_BOX.marginTop - CHART_BOX.marginBottom;
+
+    function xPos(idx) {
+      return CHART_BOX.marginLeft + (idx / (X_LABELS.length - 1)) * PLOT_W;
+    }
+    function yPos(val) {
+      return CHART_BOX.marginTop + PLOT_H - (val / 200) * PLOT_H;
+    }
+
+    function getCartesianSvgMarkup(mode) {
+      return `
+        <div class="chart-box">
+          <svg class="cartesian-svg" id="svg-${mode}" viewBox="0 0 ${CHART_BOX.width} ${CHART_BOX.height}">
+            <g class="layer-grid"></g>
+            <g class="layer-lines"></g>
+            <g class="layer-hover"></g>
+            <g class="layer-points"></g>
+          </svg>
+        </div>
+      `;
+    }
+
+    function setupCartesianChart(mode) {
+      const svg = document.getElementById(`svg-${mode}`);
+      if (!svg) return;
+      const gGrid = svg.querySelector(".layer-grid");
+      const gLines = svg.querySelector(".layer-lines");
+      const gHover = svg.querySelector(".layer-hover");
+      const gPoints = svg.querySelector(".layer-points");
+
+      let gridHtml = "";
+      Y_VALUES.forEach((yVal) => {
+        const y = yPos(yVal);
+        gridHtml += `
+          <line x1="${CHART_BOX.marginLeft}" y1="${y}" x2="${CHART_BOX.width - CHART_BOX.marginRight}" y2="${y}"
+                class="${yVal === 0 ? 'axis-line' : 'grid-line'}" />
+          <text x="${CHART_BOX.marginLeft - 12}" y="${y + 4}" text-anchor="end" class="axis-label">${yVal}</text>
+        `;
+      });
+
+      X_LABELS.forEach((lbl, idx) => {
+        const x = xPos(idx);
+        gridHtml += `
+          <line x1="${x}" y1="${CHART_BOX.marginTop}" x2="${x}" y2="${CHART_BOX.height - CHART_BOX.marginBottom}"
+                class="${idx === 0 ? 'axis-line' : 'grid-line'}" />
+          <text x="${x}" y="${CHART_BOX.height - CHART_BOX.marginBottom + 22}" text-anchor="middle" class="axis-label">${lbl}</text>
+        `;
+      });
+
+      gridHtml += `
+        <text x="${CHART_BOX.marginLeft + PLOT_W / 2}" y="${CHART_BOX.height - 8}" text-anchor="middle" class="axis-title">
+          Eixo X — Tempo (Horário)
+        </text>
+        <text x="18" y="${CHART_BOX.marginTop + PLOT_H / 2}" text-anchor="middle" class="axis-title"
+              transform="rotate(-90, 18, ${CHART_BOX.marginTop + PLOT_H / 2})">
+          PM 2,5 (µg/m³)
+        </text>
+      `;
+      gGrid.innerHTML = gridHtml;
+
+      function drawPt(idx, val, tag, extraCls = "") {
+        const cx = xPos(idx);
+        const cy = yPos(val);
+        const dy = val >= 160 ? 22 : -12;
+        gPoints.innerHTML += `
+          <g>
+            <circle cx="${cx}" cy="${cy}" r="7" class="plotted-point ${extraCls}" />
+            <text x="${cx}" y="${cy + dy}" text-anchor="middle" class="point-tag">${tag}</text>
+          </g>
+        `;
+      }
+
+      function drawSeg(i1, v1, i2, v2, cls = "") {
+        gLines.innerHTML += `
+          <line x1="${xPos(i1)}" y1="${yPos(v1)}" x2="${xPos(i2)}" y2="${yPos(v2)}" class="chart-segment ${cls}" />
+        `;
+      }
+
+      if (mode === "interactive-p1") {
+        if (lessonState.p1_A) drawPt(0, 160, "A (06h, 160)");
+        if (lessonState.p1_B) drawPt(4, 40, "B (14h, 40)");
+        if (lessonState.p1_A && lessonState.p1_B) drawSeg(0, 160, 4, 40);
+      } else if (mode === "readonly-AB") {
+        drawSeg(0, 160, 4, 40);
+        drawPt(0, 160, "A (06h, 160)");
+        drawPt(4, 40, "B (14h, 40)");
+      } else if (mode === "interactive-p4") {
+        drawSeg(0, 160, 4, 40);
+        drawPt(0, 160, "A (06h, 160)");
+        drawPt(4, 40, "B (14h, 40)");
+        if (lessonState.pageCompleted[4]) {
+          gLines.innerHTML = "";
+          drawSeg(0, 160, 2, 120);
+          drawSeg(2, 120, 4, 40);
+          drawPt(2, 120, "C (10h, 120)", "active-point");
+        }
+      } else if (mode === "readonly-ACB") {
+        drawSeg(0, 160, 2, 120);
+        drawSeg(2, 120, 4, 40);
+        drawPt(0, 160, "A (06h, 160)");
+        drawPt(2, 120, "C (10h, 120)");
+        drawPt(4, 40, "B (14h, 40)");
+        if (lessonState.pageCompleted[5]) {
+          drawPt(3, 80, "12h → 80", "active-point");
+        }
+      } else if (mode === "interactive-p6") {
+        drawSeg(0, 160, 2, 120);
+        drawSeg(2, 120, 4, 40);
+        drawPt(0, 160, "A (06h, 160)");
+        drawPt(2, 120, "C (10h, 120)");
+        drawPt(4, 40, "B (14h, 40)");
+        if (lessonState.pageCompleted[6]) {
+          drawSeg(4, 40, 6, 120, "evening");
+          drawPt(6, 120, "D (18h, 120)", "active-point");
+        }
+      } else if (mode === "interactive-p8") {
+        drawSeg(0, 160, 2, 120);
+        drawSeg(2, 120, 4, 40);
+        drawSeg(4, 40, 6, 120, "evening");
+        drawPt(0, 160, "Hoje (06h, 160)");
+        drawPt(2, 120, "C (10h, 120)");
+        drawPt(4, 40, "B (14h, 40)");
+        drawPt(6, 120, "D (18h, 120)");
+        if (lessonState.pageCompleted[8] && lessonState.predictedY !== null) {
+          drawPt(0, lessonState.predictedY, `Amanhã (06h, ${lessonState.predictedY})`, "active-point");
+        }
+      }
+
+      if (!mode.startsWith("interactive")) {
+        svg.style.cursor = "default";
+        return;
+      }
+
+      function nearestNode(evt) {
+        const rect = svg.getBoundingClientRect();
+        const sx = (evt.clientX - rect.left) * (CHART_BOX.width / rect.width);
+        const sy = (evt.clientY - rect.top) * (CHART_BOX.height / rect.height);
+
+        let bIdx = 0;
+        let minDx = Infinity;
+        X_LABELS.forEach((_, idx) => {
+          const d = Math.abs(sx - xPos(idx));
+          if (d < minDx) {
+            minDx = d;
+            bIdx = idx;
+          }
+        });
+
+        const yCandidates = mode === "interactive-p8"
+          ? [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200]
+          : Y_VALUES;
+
+        let bVal = 0;
+        let minDy = Infinity;
+        yCandidates.forEach((v) => {
+          const d = Math.abs(sy - yPos(v));
+          if (d < minDy) {
+            minDy = d;
+            bVal = v;
+          }
+        });
+
+        const px = xPos(bIdx);
+        const py = yPos(bVal);
+        return {
+          xIdx: bIdx,
+          xLabel: X_LABELS[bIdx],
+          yVal: bVal,
+          px,
+          py,
+          close: Math.hypot(sx - px, sy - py) < 44
+        };
+      }
+
+      svg.addEventListener("mousemove", (evt) => {
+        const pt = nearestNode(evt);
+        if (!pt.close) {
+          gHover.innerHTML = "";
+          return;
+        }
+        gHover.innerHTML = `
+          <g style="pointer-events:none;">
+            <circle cx="${pt.px}" cy="${pt.py}" r="11" fill="rgba(44, 201, 107, 0.2)" />
+            <circle cx="${pt.px}" cy="${pt.py}" r="5" fill="#2cc96b" />
+            <rect x="${pt.px - 42}" y="${pt.py - 32}" width="84" height="20" rx="6" fill="#191919" />
+            <text x="${pt.px}" y="${pt.py - 18}" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">
+              (${pt.xLabel}, ${pt.yVal})
+            </text>
+          </g>
+        `;
+      });
+
+      svg.addEventListener("mouseleave", () => {
+        gHover.innerHTML = "";
+      });
+
+      svg.addEventListener("click", (evt) => {
+        const pt = nearestNode(evt);
+        if (!pt.close) return;
+
+        if (mode === "interactive-p1") {
+          if (pt.xLabel === "06h" && pt.yVal === 160) {
+            lessonState.p1_A = true;
+          } else if (pt.xLabel === "14h" && pt.yVal === 40) {
+            lessonState.p1_B = true;
+          } else {
+            openFeedbackTray(
+              false,
+              `Você clicou em (${pt.xLabel}, ${pt.yVal})`,
+              "Procure exatamente o Ponto A (06h, 160) e o Ponto B (14h, 40) na grade.",
+              "Tentar Novamente"
+            );
+            return;
+          }
+          if (lessonState.p1_A && lessonState.p1_B) {
+            lessonState.pageCompleted[1] = true;
+          }
+          renderCurrentBrilliantPage();
+          return;
+        }
+
+        if (mode === "interactive-p4") {
+          if (pt.xLabel === "10h" && pt.yVal === 120) {
+            lessonState.pageCompleted[4] = true;
+            renderCurrentBrilliantPage();
+          } else {
+            openFeedbackTray(
+              false,
+              `Coordenada (${pt.xLabel}, ${pt.yVal})`,
+              "Localize 10h no eixo X e suba até a linha de 120 no eixo Y para marcar o Ponto C.",
+              "Tentar Novamente"
+            );
+          }
+          return;
+        }
+
+        if (mode === "interactive-p6") {
+          if (pt.xLabel === "18h" && pt.yVal === 120) {
+            lessonState.pageCompleted[6] = true;
+            renderCurrentBrilliantPage();
+          } else {
+            openFeedbackTray(
+              false,
+              `Coordenada (${pt.xLabel}, ${pt.yVal})`,
+              "O Ponto D fica exatamente em X = 18h e Y = 120.",
+              "Tentar Novamente"
+            );
+          }
+          return;
+        }
+
+        if (mode === "interactive-p8") {
+          if (pt.xLabel === "06h") {
+            lessonState.predictedY = pt.yVal;
+            lessonState.pageCompleted[8] = true;
+            renderCurrentBrilliantPage();
+            persistStudentPrediction(pt.yVal);
+          } else {
+            openFeedbackTray(
+              false,
+              "Clique na coluna das 06h!",
+              "Para prever o nível de amanhã às 06h, clique sobre a primeira linha vertical (06h).",
+              "Entendi"
+            );
+          }
+        }
+      });
+    }
+
+    /* =========================================================================
+       5. QUESTÕES DE MÚLTIPLA ESCOLHA + FEEDBACK DRAWER
+       ========================================================================= */
+    const QUIZ_EXPLANATIONS = {
+      2: {
+        okTitle: "Correto! A reta é decrescente.",
+        okDesc: "À medida que a manhã avança para a tarde (06h → 14h), a concentração de PM 2,5 cai de 160 para 40 µg/m³.",
+        errTitle: "Observe o sentido da reta",
+        errDesc: "Da esquerda (06h) para a direita (14h), a linha desce de 160 até 40. Logo, ela é decrescente!"
+      },
+      3: {
+        okTitle: "Perfeito! Par ordenado (14h, 40).",
+        okDesc: "No par ordenado (x, y), o X representa sempre o Tempo no eixo horizontal (14h) e o Y representa a concentração de PM 2,5 (40).",
+        errTitle: "Atenção à ordem de (x, y)!",
+        errDesc: "No Plano Cartesiano, X (Tempo) vem sempre primeiro, seguido por Y (PM 2,5). Às 14h tivemos 40 µg/m³."
+      },
+      5: {
+        okTitle: "Excelente dedução do ponto médio!",
+        okDesc: "12h fica exatamente na metade entre 10h e 14h. Na reta constante, o ponto médio entre 120 e 40 é (120 + 40) ÷ 2 = 80 µg/m³!",
+        errTitle: "Siga a linha das 12h no gráfico",
+        errDesc: "Olhe onde a linha vertical de 12h cruza a reta azul: é exatamente no ponto médio entre 120 e 40!"
+      }
+    };
+
+    function selectChoice(pageNum, choiceIdx) {
+      if (lessonState.pageCompleted[pageNum]) return;
+      lessonState.selectedChoice[pageNum] = choiceIdx;
+      for (let i = 0; i < 4; i++) {
+        const el = document.getElementById(`choice-${pageNum}-${i}`);
+        if (el) {
+          el.classList.remove("selected", "wrong");
+          if (i === choiceIdx) el.classList.add("selected");
+        }
+      }
+      const btn = document.getElementById(`btn-check-${pageNum}`);
+      if (btn) btn.disabled = false;
+    }
+
+    function verifyChoiceQuestion(pageNum, correctIdx) {
+      const chosen = lessonState.selectedChoice[pageNum];
+      if (chosen === null || chosen === undefined) return;
+      const btnEl = document.getElementById(`choice-${pageNum}-${chosen}`);
+      const exp = QUIZ_EXPLANATIONS[pageNum];
+
+      if (chosen === correctIdx) {
+        lessonState.pageCompleted[pageNum] = true;
+        btnEl.classList.remove("selected");
+        btnEl.classList.add("correct");
+        document.getElementById(`btn-check-${pageNum}`).style.display = "none";
+        renderHudSegments();
+        if (pageNum === 5) setupCartesianChart("readonly-ACB");
+        openFeedbackTray(true, exp.okTitle, exp.okDesc, "Continuar →");
+      } else {
+        btnEl.classList.add("wrong");
+        openFeedbackTray(false, exp.errTitle, exp.errDesc, "Tentar Novamente");
+      }
+    }
+
+    function restoreCompletedQuizState(pageNum, correctIdx) {
+      if (!lessonState.pageCompleted[pageNum]) return;
+      const btnEl = document.getElementById(`choice-${pageNum}-${correctIdx}`);
+      if (btnEl) btnEl.classList.add("correct");
+      const checkBtn = document.getElementById(`btn-check-${pageNum}`);
+      if (checkBtn) checkBtn.style.display = "none";
+      const exp = QUIZ_EXPLANATIONS[pageNum];
+      openFeedbackTray(true, exp.okTitle, exp.okDesc, "Continuar →");
+    }
+
+    /* =========================================================================
+       6. SIMULADOR DE INVERSÃO TÉRMICA (PÁGINA 7)
+       ========================================================================= */
+    function handleBrilliantSimSlider(val) {
+      const v = Number(val);
+      const stage = document.getElementById("sim-stage");
+      const label = document.getElementById("sim-status-label");
+      const celestial = document.getElementById("sim-celestial");
+      const smoke = document.getElementById("sim-smoke");
+      const smokeBadge = document.getElementById("smoke-badge-text");
+
+      const heatFactor = 1 - Math.abs(v - 50) / 50;
+      if (v > 35 && v < 65) lessonState.simTouchedMid = true;
+      if (v >= 80) lessonState.simTouchedEnd = true;
+
+      smoke.style.top = Math.round(95 - heatFactor * 80) + "px";
+      smoke.style.opacity = (0.92 - heatFactor * 0.68).toFixed(2);
+
+      if (heatFactor > 0.6) {
+        stage.style.background = "linear-gradient(180deg, #0284c7 0%, #7dd3fc 100%)";
+        celestial.style.top = "18px";
+        celestial.style.background = "#fde047";
+        label.textContent = "☀️ Tarde Quente (14h) • Nuvem dissipa e sobe (40 µg/m³)";
+        smokeBadge.textContent = "Sol aquece o ar: poluentes sobem e deixam o céu azul";
+      } else if (v < 50) {
+        stage.style.background = "linear-gradient(180deg, #1e293b 0%, #475569 100%)";
+        celestial.style.top = "62px";
+        celestial.style.background = "#fef08a";
+        label.textContent = "❄️ Manhã Fria (06h) • Fumaça presa na cidade (160 µg/m³)";
+        smokeBadge.textContent = "Inversão térmica: ar frio mantém a fumaça baixa";
+      } else {
+        stage.style.background = "linear-gradient(180deg, #0f172a 0%, #334155 100%)";
+        celestial.style.top = "56px";
+        celestial.style.background = "#e2e8f0";
+        label.textContent = "🌙 Noite Fria (18h) • Fumaça volta a descer (120 µg/m³)";
+        smokeBadge.textContent = "Chão esfria ao pôr do sol: PM 2,5 volta a subir";
+      }
+
+      if (lessonState.simTouchedMid && lessonState.simTouchedEnd && !lessonState.pageCompleted[7]) {
+        lessonState.pageCompleted[7] = true;
+        renderHudSegments();
+        openFeedbackTray(
+          true,
+          "Simulação Concluída!",
+          "Você compreendeu como a temperatura governa a curva do gráfico. Vamos para o Chute Final!",
+          "Ir para a Previsão Empírica →"
+        );
+      }
+    }
+
+    /* =========================================================================
+       7. CONTROLE DO DRAWER INFERIOR
+       ========================================================================= */
+    let trayModeIsSuccess = true;
+    function openFeedbackTray(isSuccess, title, desc, btnLabel) {
+      trayModeIsSuccess = isSuccess;
+      const tray = document.getElementById("brilliant-tray");
+      document.getElementById("tray-title").textContent = (isSuccess ? "✓ " : "✕ ") + title;
+      document.getElementById("tray-desc").textContent = desc;
+      document.getElementById("tray-btn").textContent = btnLabel;
+      tray.className = "brilliant-bottom-tray open " + (isSuccess ? "tray-success" : "tray-error");
+    }
+
+    function closeFeedbackTray() {
+      document.getElementById("brilliant-tray").classList.remove("open");
+    }
+
+    function onTrayButtonClick() {
+      if (trayModeIsSuccess) goNextPage();
+      else closeFeedbackTray();
+    }
+
+    /* =========================================================================
+       8. SALVANDO NO SUPABASE (TABELA EXCLUSIVA previsoes_pm25_9ano)
+       ========================================================================= */
+    async function persistStudentPrediction(predictedY) {
+      launchConfetti();
+      renderHudSegments();
+
+      const record = {
+        turma: selectedLoginTurma,
+        aluno_nome: selectedStudentName,
+        hora_prevista: "06h",
+        pm25_previsto: predictedY,
+        created_at: new Date().toISOString()
+      };
+
+      const localList = getLocalSubmissions();
+      const existingIdx = localList.findIndex(
+        (r) => r.turma === record.turma && r.aluno_nome === record.aluno_nome
+      );
+      if (existingIdx >= 0) localList[existingIdx] = record;
+      else localList.unshift(record);
+      localStorage.setItem("terceiroremota14_pm25_submissions", JSON.stringify(localList));
+
+      const syncMsgEl = document.getElementById("final-sync-msg");
+
+      if (!supabaseClient) return;
+
+      try {
+        const { error } = await supabaseClient.from(SUPABASE_TABLE).insert([
+          {
+            turma: selectedLoginTurma,
+            aluno_nome: selectedStudentName,
+            hora_prevista: "06h",
+            pm25_previsto: predictedY
+          }
+        ]);
+
+        if (error) {
+          // Fallback caso a tabela tenha sido criada sem a coluna turma separada
+          await supabaseClient.from(SUPABASE_TABLE).insert([
+            {
+              aluno_nome: `${selectedLoginTurma} - ${selectedStudentName}`,
+              hora_prevista: "06h",
+              pm25_previsto: predictedY
+            }
+          ]);
+        }
+
+        if (syncMsgEl) {
+          syncMsgEl.innerHTML =
+            `☁️ Salvo no Supabase (<code>${SUPABASE_TABLE}</code>) para <strong>${selectedStudentName} • Turma ${selectedLoginTurma}</strong>!`;
+        }
+      } catch (err) {
+        console.warn("Modo fallback local ativo:", err);
+      }
+    }
+
+    function getLocalSubmissions() {
+      try {
+        const raw = localStorage.getItem("terceiroremota14_pm25_submissions");
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return [];
+    }
+
+    /* =========================================================================
+       9. PAINEL DO PROFESSOR E CONSULTA DE ALUNOS E RESPONSÁVEIS
+       ========================================================================= */
+    async function fetchAllSubmissionsUnified() {
+      const localData = getLocalSubmissions();
+      if (!supabaseClient) return localData;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from(SUPABASE_TABLE)
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(400);
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return data.map((row) => {
+            let turma = row.turma || "";
+            let nome = row.aluno_nome || "";
+            if (!turma && nome.includes(" - ")) {
+              const parts = nome.split(" - ");
+              turma = parts[0].trim();
+              nome = parts.slice(1).join(" - ").trim();
+            }
+            return {
+              turma: turma || "9º Ano",
+              aluno_nome: nome,
+              pm25_previsto: Number(row.pm25_previsto),
+              created_at: row.created_at
+            };
+          });
+        }
+      } catch (e) {}
+      return localData;
+    }
+
+    let cachedTeacherRows = [];
+
+    async function loadTeacherDashboard() {
+      const all = await fetchAllSubmissionsUnified();
+      const filterTurma = document.getElementById("prof-filter-turma").value;
+
+      const filtered =
+        filterTurma === "TODAS"
+          ? all
+          : all.filter((r) => r.turma === filterTurma);
+
+      cachedTeacherRows = filtered;
+      document.getElementById("kpi-total").textContent = filtered.length;
+
+      if (filtered.length > 0) {
+        const sum = filtered.reduce((acc, r) => acc + (Number(r.pm25_previsto) || 0), 0);
+        const avg = Math.round(sum / filtered.length);
+        const rainCount = filtered.filter((r) => Number(r.pm25_previsto) < 160).length;
+        const rainPct = Math.round((rainCount / filtered.length) * 100);
+
+        document.getElementById("kpi-avg-pm25").textContent = `${avg} µg/m³`;
+        document.getElementById("kpi-rain-effect").textContent = `${rainPct}%`;
+      } else {
+        document.getElementById("kpi-avg-pm25").textContent = "-- µg/m³";
+        document.getElementById("kpi-rain-effect").textContent = "--%";
+      }
+
+      const tbody = document.getElementById("prof-table-body");
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 26px;">
+              Nenhuma entrega registrada ainda para este filtro.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered
+        .map((r) => {
+          const dt = r.created_at
+            ? new Date(r.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" })
+            : "Agora";
+          return `
+            <tr>
+              <td>${dt}</td>
+              <td><strong>${r.turma}</strong></td>
+              <td>${r.aluno_nome}</td>
+              <td><strong>(06h, ${r.pm25_previsto} µg/m³)</strong></td>
+              <td>8 / 8 páginas</td>
+              <td><span class="status-pill ok">✓ Entregue</span></td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function exportTeacherCsv() {
+      const head = ["Horario_Manaus", "Turma", "Aluno", "PM25_Previsto_06h", "Status"];
+      const rows = cachedTeacherRows.map((r) => [
+        r.created_at ? new Date(r.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" }) : "",
+        r.turma,
+        r.aluno_nome,
+        r.pm25_previsto,
+        "Entregue"
+      ]);
+      const csvContent =
+        "\uFEFF" +
+        [head, ...rows]
+          .map((line) => line.map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(";"))
+          .join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "previsoes-pm25-9ano-manaus.csv";
+      link.click();
+    }
+
+    function selectTurmaForConsulta(turma) {
+      selectedConsultaTurma = turma;
+      initTurmaUI();
+
+      const names = ROSTERS[turma] || [];
+      const sel = document.getElementById("consulta-student-select");
+      sel.innerHTML =
+        `<option value="">-- Selecione o nome do aluno (${turma}) --</option>` +
+        names.map((n) => `<option value="${n}">${n}</option>`).join("");
+      document.getElementById("consulta-result-box").style.display = "none";
+    }
+
+    async function runParentStudentLookup() {
+      const studentName = document.getElementById("consulta-student-select").value;
+      const box = document.getElementById("consulta-result-box");
+      if (!selectedConsultaTurma || !studentName) {
+        box.style.display = "none";
+        return;
+      }
+
+      const all = await fetchAllSubmissionsUnified();
+      const match = all.find(
+        (r) =>
+          r.aluno_nome.toLowerCase() === studentName.toLowerCase() &&
+          (r.turma === selectedConsultaTurma || !r.turma)
+      );
+
+      box.style.display = "block";
+      if (match) {
+        const dt = match.created_at
+          ? new Date(match.created_at).toLocaleString("pt-BR", { timeZone: "America/Manaus" })
+          : "Registrado hoje";
+        box.innerHTML = `
+          <div style="padding: 22px; border-radius: 18px; background: var(--brilliant-green-light); border: 2px solid var(--brilliant-green);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+              <span class="status-pill ok" style="font-size: 0.85rem;">✓ ENTREGA CONFIRMADA (8/8 ETAPAS)</span>
+              <span style="font-size: 0.82rem; font-weight: 700; color: #134e2a;">Recebida em: ${dt} (Manaus)</span>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0b4f26;">${studentName} • Turma ${selectedConsultaTurma}</h3>
+            <p style="font-size: 0.94rem; color: #134e2a; margin-top: 8px;">
+              Atividade concluída com sucesso! O(a) estudante realizou todas as etapas interativas de Plano Cartesiano e Previsão Empírica de Qualidade do Ar (PM 2,5).
+            </p>
+            <div style="margin-top: 12px; padding: 10px 14px; background: #ffffff; border-radius: 12px; font-size: 0.9rem; font-weight: 700; color: var(--text-main);">
+              🌧️ Previsão Empírica Registrada (Amanhã às 06h): <strong>${match.pm25_previsto} µg/m³</strong>
+            </div>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div style="padding: 22px; border-radius: 18px; background: #fffbeb; border: 2px solid #fcd34d;">
+            <span class="status-pill pending">⏳ PENDENTE DE ENTREGA</span>
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: #78350f; margin-top: 10px;">
+              ${studentName} • Turma ${selectedConsultaTurma}
+            </h3>
+            <p style="font-size: 0.92rem; color: #92400e; margin-top: 6px;">
+              Ainda não consta entrega registrada para este estudante. Acesse a aba <strong>"Atividade dos alunos"</strong> para realizar e enviar!
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    function switchPlatformModule(mod) {
+      ["aluno", "professor", "consulta"].forEach((m) => {
+        document.getElementById(`module-${m}`).classList.toggle("active", m === mod);
+        document.getElementById(`tab-btn-${m}`).classList.toggle("active", m === mod);
+      });
+      if (mod !== "aluno") closeFeedbackTray();
+      if (mod === "professor") loadTeacherDashboard();
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const colors = ["#2cc96b", "#2f6fed", "#f59e0b", "#ec4899", "#8b5cf6"];
+      const pieces = Array.from({ length: 85 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 150,
+        size: 6 + Math.random() * 6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vy: 2.5 + Math.random() * 4,
+        vx: -2 + Math.random() * 4,
+        angle: Math.random() * 6,
+        spin: -0.1 + Math.random() * 0.2
+      }));
+      let f = 0;
+      function step() {
+        f++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.angle += p.spin;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+          ctx.restore();
+        });
+        if (f < 160) requestAnimationFrame(step);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Suporte a link direto via hash (#professor ou #consulta)
+    function checkUrlHash() {
+      const h = window.location.hash.replace("#", "").toLowerCase();
+      if (h === "professor") switchPlatformModule("professor");
+      else if (h === "consulta") switchPlatformModule("consulta");
+    }
+    window.addEventListener("hashchange", checkUrlHash);
+
+    initTurmaUI();
+    checkUrlHash();
+  </script>
+</body>
+</html>
