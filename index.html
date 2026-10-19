@@ -326,22 +326,24 @@
 
     .turma-pills {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
 
     .turma-pill-btn {
-      padding: 13px 12px;
+      padding: 14px 10px;
       border-radius: 14px;
       border: 2px solid var(--border-light);
       background: #ffffff;
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--text-main);
       cursor: pointer;
       transition: all 0.18s ease;
       text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     .turma-pill-btn:hover {
@@ -364,7 +366,7 @@
       border: 2px solid var(--border-light);
       background: #ffffff;
       font-family: inherit;
-      font-size: 0.98rem;
+      font-size: 16px;
       font-weight: 600;
       color: var(--text-main);
       outline: none;
@@ -470,14 +472,14 @@
     }
 
     .axis-label {
-      font-size: 12px;
-      font-weight: 700;
-      fill: #515154;
+      font-size: 13.5px;
+      font-weight: 800;
+      fill: #3a3a3c;
       font-family: 'Inter', sans-serif;
     }
 
     .axis-title {
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 800;
       fill: #1d1d1f;
       text-transform: uppercase;
@@ -486,7 +488,7 @@
 
     .chart-segment {
       stroke: var(--brilliant-blue);
-      stroke-width: 4;
+      stroke-width: 4.5;
       stroke-linecap: round;
       fill: none;
     }
@@ -499,7 +501,7 @@
       fill: #ffffff;
       stroke: var(--brilliant-blue);
       stroke-width: 4;
-      r: 7;
+      r: 8;
     }
 
     .plotted-point.active-point {
@@ -508,9 +510,46 @@
     }
 
     .point-tag {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
       fill: #1d1d1f;
+    }
+
+    .grid-touch-node {
+      fill: rgba(47, 111, 237, 0.14);
+      stroke: rgba(47, 111, 237, 0.38);
+      stroke-width: 1.5;
+      transition: all 0.15s ease;
+    }
+
+    .quick-tap-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .quick-tap-btn {
+      padding: 11px 8px;
+      border-radius: 12px;
+      border: 2px solid var(--border-light);
+      background: #ffffff;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: center;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.15s ease;
+    }
+
+    .quick-tap-btn:active,
+    .quick-tap-btn.active-tap {
+      border-color: var(--brilliant-green);
+      background: var(--brilliant-green-light);
+      color: #0b4f26;
     }
 
     /* =========================================================================
@@ -818,22 +857,33 @@
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 10px;
+      height: 14px;
       border-radius: 999px;
       background: linear-gradient(90deg, #64748b 0%, #f59e0b 50%, #475569 100%);
       outline: none;
       cursor: pointer;
+      touch-action: none;
     }
 
     input[type="range"].brilliant-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 26px;
-      height: 26px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: #ffffff;
       border: 4px solid var(--brilliant-green);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.22);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      cursor: grab;
+    }
+
+    input[type="range"].brilliant-slider::-moz-range-thumb {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 4px solid var(--brilliant-green);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
       cursor: grab;
     }
 
@@ -880,6 +930,7 @@
 
     .table-wrap {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       border: 1px solid var(--border-light);
       border-radius: 16px;
       background: #ffffff;
@@ -935,12 +986,143 @@
       z-index: 999;
     }
 
+    /* =========================================================================
+       OTIMIZAÇÃO MOBILE-FIRST PARA CELULARES DOS ALUNOS (TELAS < 640px)
+       ========================================================================= */
     @media (max-width: 640px) {
-      .brilliant-card {
-        padding: 22px 16px;
+      .platform-header-inner {
+        padding: 8px 12px;
+        gap: 8px;
       }
+
+      .brand-identity {
+        font-size: 0.85rem;
+      }
+
+      .module-tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+      }
+
+      .module-tab-btn {
+        padding: 7px 6px;
+        font-size: 0.72rem;
+        line-height: 1.15;
+        text-align: center;
+        white-space: normal;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+      }
+
+      .brilliant-hud {
+        padding: 8px 12px;
+      }
+
       .hud-student-pill {
         display: none;
+      }
+
+      .brilliant-stage {
+        margin: 12px auto 150px;
+        padding: 0 10px;
+      }
+
+      .brilliant-card {
+        padding: 18px 14px;
+        border-radius: 20px;
+      }
+
+      .brilliant-card h1,
+      .brilliant-card h2 {
+        font-size: 1.2rem;
+        line-height: 1.28;
+      }
+
+      .brilliant-card p.lead-text {
+        font-size: 0.92rem;
+        margin-bottom: 14px;
+      }
+
+      .mission-call {
+        padding: 10px 12px;
+        font-size: 0.86rem;
+        margin-bottom: 12px;
+      }
+
+      .chart-box {
+        padding: 10px 4px 6px;
+        border-radius: 14px;
+      }
+
+      .choice-card {
+        padding: 14px 14px;
+        font-size: 0.94rem;
+      }
+
+      .page-action-row {
+        margin-top: 16px;
+      }
+
+      .btn-check {
+        width: 100%;
+        padding: 15px 20px;
+        font-size: 1rem;
+      }
+
+      .brilliant-bottom-tray {
+        padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+      }
+
+      .tray-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+
+      .btn-tray-continue {
+        width: 100%;
+        padding: 15px 20px;
+        font-size: 1.02rem;
+        text-align: center;
+      }
+
+      .sim-stage {
+        height: 185px;
+      }
+
+      .sim-sky-label {
+        left: 10px;
+        right: 10px;
+        font-size: 0.74rem;
+        text-align: center;
+      }
+
+      .slider-labels {
+        font-size: 0.72rem;
+      }
+
+      .dashboard-wrap {
+        margin: 14px auto 60px;
+        padding: 0 10px;
+        gap: 14px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .kpi-card {
+        padding: 14px;
+        border-radius: 16px;
+      }
+
+      .kpi-value {
+        font-size: 1.35rem;
       }
     }
   </style>
@@ -1210,58 +1392,8 @@
         "PIETRO FERREIRA", "RENAN GOMES", "RENAN RAMOS", "SAMANTA VITORIA", "SAMILA HELOISA",
         "SARA CRISTINA", "SARA FERNANDA", "SARA VICTORIA", "SERGIO LUCAS", "THAYNNA RUANNE",
         "VITOR DANIEL", "NATANAEL MELHOR ALUNO"
-      ],
-      "2º T4": [
-        "AFONSO ENRIQUE", "ANA BEATRIZ", "ANA CLARA", "ANNE GABRIELE", "BRUNO MIGUEL",
-        "CAIO HENRIQUE", "CARLOS EDUARDO", "DANIEL VITOR", "DAVI LUCAS", "EDUARDO GABRIEL",
-        "EMANUELLY VITORIA", "ENZO GABRIEL", "FELIPE AUGUSTO", "GABRIEL HENRIQUE", "GIOVANNA LIMA",
-        "GUSTAVO HENRIQUE", "HELOISA VITORIA", "IGOR GABRIEL", "ISABELLA CRISTINA", "JOAO PEDRO",
-        "JOAO VICTOR", "JULIA BEATRIZ", "KAUA HENRIQUE", "LAURA BEATRIZ", "LETICIA GABRIELA",
-        "LUCAS GABRIEL", "LUIZ GUSTAVO", "MARIA CLARA", "MARIA EDUARDA", "MARIA FERNANDA",
-        "MARIA LUIZA", "MATHEUS HENRIQUE", "PEDRO HENRIQUE", "RAFAEL AUGUSTO", "SOPHIA VITORIA",
-        "THIAGO HENRIQUE", "VITOR HUGO", "YASMIN VITORIA", "NATANAEL MELHOR ALUNO"
-      ],
-      "3º T1": [
-        "ALESSANDRA LIMA", "ALEXANDRE SILVA", "AMANDA COSTA", "ANA CAROLINA", "ANDRE LUIZ",
-        "BEATRIZ ROCHA", "BRENDA KAROLINE", "BRUNO SOUZA", "CAMILA FERREIRA", "CAROLINA SANTOS",
-        "DANIEL OLIVEIRA", "DIEGO MARTINS", "EDUARDA ALMEIDA", "FERNANDA LOPES", "GABRIELA PEREIRA",
-        "GUSTAVO RIBEIRO", "HENRIQUE GOMES", "ISABELA CARVALHO", "JOAO VITOR", "JULIANA ARAUJO",
-        "LARISSA MENDES", "LEONARDO BARBOSA", "LETICIA CARDOSO", "LUCAS NASCIMENTO", "MARCELO TEIXEIRA",
-        "MARIANA MOREIRA", "MATHEUS CORREIA", "NATALIA DIAS", "PEDRO LUCAS", "RAFAELA MONTEIRO",
-        "RODRIGO FREITAS", "SABRINA VIEIRA", "THIAGO CASTRO", "VANESSA CAMPOS", "VINICIUS PINTO",
-        "NATANAEL MELHOR ALUNO"
-      ],
-      "3º T2": [
-        "ADRIANO MENDES", "ALINE BARROS", "ARTHUR GABRIEL", "BIANCA CAVALCANTE", "CAIO CESAR",
-        "CLARA NOGUEIRA", "DAVI EMANUEL", "DOUGLAS FARIAS", "ELISA MACHADO", "EMILLY SOARES",
-        "FABRICIO NEVES", "FLAVIA CUNHA", "GUILHERME AZEVEDO", "HELENA MOURA", "IGOR SANTANA",
-        "JESSICA PIRES", "JONATHAN BORGES", "KAMILA SIQUEIRA", "KEVIN MELO", "LORENA DUARTE",
-        "LUANA BATISTA", "MARCOS VINICIUS", "MAYARA GUIMARAES", "MILENA REIS", "NICOLAS XAVIER",
-        "OTAVIO BRAGA", "PATRICIA VIANA", "PAULO RICARDO", "PRISCILA MACEDO", "RENATO TAVARES",
-        "SAMUEL QUEIROZ", "TATIANE SALES", "VICTOR HUGO", "WESLEY ROCHA", "YURI MEDEIROS",
-        "NATANAEL MELHOR ALUNO"
       ]
     };
-
-    async function syncRostersFromSupabase() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/jacimar-fumaca-1910/entregas-publicas`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && Array.isArray(data.alunos)) {
-            data.alunos.forEach((a) => {
-              if (!a.turma || !a.nome) return;
-              if (!ROSTERS[a.turma]) ROSTERS[a.turma] = [];
-              const cleanName = a.nome.trim().toUpperCase();
-              if (!ROSTERS[a.turma].includes(cleanName)) {
-                ROSTERS[a.turma].push(cleanName);
-              }
-            });
-            initTurmaUI();
-          }
-        }
-      } catch (e) {}
-    }
 
     let selectedLoginTurma = "";
     let selectedStudentName = "";
@@ -1602,15 +1734,20 @@
 
           <div class="slider-box">
             <div class="slider-labels">
-              <span>❄️ Frio (Madrugada/06h)</span>
-              <span>☀️ Quente (Tarde/14h)</span>
-              <span>🌙 Frio (Noite/18h)</span>
+              <span>❄️ Frio (06h)</span>
+              <span>☀️ Quente (14h)</span>
+              <span>🌙 Frio (18h)</span>
             </div>
-            <input type="range" min="0" max="100" value="0" class="brilliant-slider"
+            <input type="range" id="sim-range-input" min="0" max="100" value="0" class="brilliant-slider"
                    oninput="handleBrilliantSimSlider(this.value)" />
+            <div class="quick-tap-grid" style="margin-top: 12px;">
+              <button type="button" class="quick-tap-btn" onclick="setSimSliderValue(0)">❄️ Manhã (06h)</button>
+              <button type="button" class="quick-tap-btn" onclick="setSimSliderValue(50)">☀️ Tarde (14h)</button>
+              <button type="button" class="quick-tap-btn" onclick="setSimSliderValue(100)">🌙 Noite (18h)</button>
+            </div>
           </div>
-          <p style="font-size: 0.86rem; color: var(--text-muted); margin-top: 12px; text-align: center;">
-            👆 Passe pelo meio (Quente/Tarde) e leve até o fim (Frio/Noite) para avançar ao Desafio Final!
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 12px; text-align: center;">
+            👆 Arraste a barra (ou toque nos botões) passando pela <strong>Tarde (14h)</strong> e depois pela <strong>Noite (18h)</strong>!
           </p>
         `;
         if (lessonState.pageCompleted[7]) {
@@ -1627,7 +1764,7 @@
           <h2>Onde o Ponto de amanhã às 06h vai nascer?</h2>
           <p class="lead-text">
             🌧️ <strong>Ontem choveu forte em Manaus!</strong> A chuva "lava" as partículas PM 2,5 do ar.
-            Baseado nessa observação empírica de hoje (em que às 06h sem chuva tínhamos <strong>160 µg/m³</strong>), clique no gráfico no <strong>eixo de 06h</strong> para marcar onde você acha que o <strong>Ponto de amanhã às 06h</strong> vai nascer!
+            Baseado nessa observação empírica de hoje (em que às 06h sem chuva tínhamos <strong>160 µg/m³</strong>), toque no gráfico na <strong>linha de 06h</strong> (ou escolha abaixo) para marcar onde o <strong>Ponto de amanhã às 06h</strong> vai nascer!
           </p>
           <div class="mission-call ${lessonState.pageCompleted[8] ? 'done' : ''}">
             <span class="mission-dot"></span>
@@ -1635,15 +1772,32 @@
               ${
                 lessonState.pageCompleted[8]
                   ? `✓ Chute Final registrado: (06h, ${lessonState.predictedY} µg/m³)!`
-                  : "Clique na primeira linha vertical (06h) na altura Y que representa sua previsão."
+                  : "Toque na primeira linha vertical (06h) no gráfico ou em uma das opções abaixo:"
               }
             </span>
           </div>
           ${getCartesianSvgMarkup("interactive-p8")}
-          <div id="final-celebration-banner" style="display: none; margin-top: 18px; padding: 24px; border-radius: 20px; background: var(--brilliant-green-light); border: 2px solid var(--brilliant-green); text-align: center;">
-            <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--brilliant-green); color: #fff; font-size: 2rem; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">✓</div>
-            <h3 style="font-size: 1.3rem; font-weight: 800; color: #0b4f26;">Parabéns, ${selectedStudentName}!</h3>
-            <p style="font-size: 0.95rem; color: #134e2a; margin-top: 6px;" id="final-sync-msg">
+          <div style="margin-top: 6px;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-align: center;">
+              📱 Toque rápido para celular — Previsão para 06h (pós-chuva):
+            </div>
+            <div class="quick-tap-grid">
+              ${[20, 40, 60, 80, 120, 160]
+                .map(
+                  (val) => `
+                  <button type="button" class="quick-tap-btn ${lessonState.predictedY === val ? 'active-tap' : ''}"
+                          onclick="submitQuickPrediction(${val})">
+                    (06h, ${val})
+                  </button>
+                `
+                )
+                .join("")}
+            </div>
+          </div>
+          <div id="final-celebration-banner" style="display: none; margin-top: 18px; padding: 22px 16px; border-radius: 20px; background: var(--brilliant-green-light); border: 2px solid var(--brilliant-green); text-align: center;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--brilliant-green); color: #fff; font-size: 1.9rem; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">✓</div>
+            <h3 style="font-size: 1.22rem; font-weight: 800; color: #0b4f26;">Parabéns, ${selectedStudentName}!</h3>
+            <p style="font-size: 0.92rem; color: #134e2a; margin-top: 6px;" id="final-sync-msg">
               Enviando sua previsão para o banco de dados do Prof. Natanael...
             </p>
           </div>
@@ -1657,19 +1811,33 @@
       }
     }
 
+    function setSimSliderValue(val) {
+      const inp = document.getElementById("sim-range-input");
+      if (inp) inp.value = val;
+      handleBrilliantSimSlider(val);
+    }
+
+    function submitQuickPrediction(yVal) {
+      lessonState.predictedY = yVal;
+      lessonState.pageCompleted[8] = true;
+      renderCurrentBrilliantPage();
+      persistStudentPrediction(yVal);
+    }
+
     /* =========================================================================
        4. PLANO CARTESIANO SVG (MARCAÇÕES EXATAS DE Y: 0, 40, 80, 120, 160, 200)
+          Otimizado para toque em telas de celular
        ========================================================================= */
     const X_LABELS = ["06h", "08h", "10h", "12h", "14h", "16h", "18h", "20h"];
     const Y_VALUES = [0, 40, 80, 120, 160, 200];
 
     const CHART_BOX = {
-      marginLeft: 70,
-      marginRight: 32,
-      marginTop: 26,
-      marginBottom: 52,
-      width: 660,
-      height: 350
+      marginLeft: 58,
+      marginRight: 24,
+      marginTop: 28,
+      marginBottom: 48,
+      width: 560,
+      height: 340
     };
     const PLOT_W = CHART_BOX.width - CHART_BOX.marginLeft - CHART_BOX.marginRight;
     const PLOT_H = CHART_BOX.height - CHART_BOX.marginTop - CHART_BOX.marginBottom;
@@ -1703,12 +1871,21 @@
       const gPoints = svg.querySelector(".layer-points");
 
       let gridHtml = "";
+
+      if (mode === "interactive-p8") {
+        const x0 = xPos(0);
+        gridHtml += `
+          <rect x="${x0 - 16}" y="${CHART_BOX.marginTop - 8}" width="32" height="${PLOT_H + 16}"
+                rx="10" fill="rgba(44, 201, 107, 0.14)" stroke="rgba(44, 201, 107, 0.45)" stroke-dasharray="4 3" />
+        `;
+      }
+
       Y_VALUES.forEach((yVal) => {
         const y = yPos(yVal);
         gridHtml += `
           <line x1="${CHART_BOX.marginLeft}" y1="${y}" x2="${CHART_BOX.width - CHART_BOX.marginRight}" y2="${y}"
                 class="${yVal === 0 ? 'axis-line' : 'grid-line'}" />
-          <text x="${CHART_BOX.marginLeft - 12}" y="${y + 4}" text-anchor="end" class="axis-label">${yVal}</text>
+          <text x="${CHART_BOX.marginLeft - 10}" y="${y + 5}" text-anchor="end" class="axis-label">${yVal}</text>
         `;
       });
 
@@ -1717,16 +1894,31 @@
         gridHtml += `
           <line x1="${x}" y1="${CHART_BOX.marginTop}" x2="${x}" y2="${CHART_BOX.height - CHART_BOX.marginBottom}"
                 class="${idx === 0 ? 'axis-line' : 'grid-line'}" />
-          <text x="${x}" y="${CHART_BOX.height - CHART_BOX.marginBottom + 22}" text-anchor="middle" class="axis-label">${lbl}</text>
+          <text x="${x}" y="${CHART_BOX.height - CHART_BOX.marginBottom + 21}" text-anchor="middle" class="axis-label">${lbl}</text>
         `;
       });
 
+      // Desenha bolinhas sutis nas interseções para facilitar o toque no celular
+      if (mode.startsWith("interactive")) {
+        if (mode === "interactive-p8") {
+          [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200].forEach((yVal) => {
+            gridHtml += `<circle cx="${xPos(0)}" cy="${yPos(yVal)}" r="5.5" class="grid-touch-node" />`;
+          });
+        } else {
+          X_LABELS.forEach((_, xi) => {
+            Y_VALUES.forEach((yv) => {
+              gridHtml += `<circle cx="${xPos(xi)}" cy="${yPos(yv)}" r="5" class="grid-touch-node" />`;
+            });
+          });
+        }
+      }
+
       gridHtml += `
-        <text x="${CHART_BOX.marginLeft + PLOT_W / 2}" y="${CHART_BOX.height - 8}" text-anchor="middle" class="axis-title">
+        <text x="${CHART_BOX.marginLeft + PLOT_W / 2}" y="${CHART_BOX.height - 6}" text-anchor="middle" class="axis-title">
           Eixo X — Tempo (Horário)
         </text>
-        <text x="18" y="${CHART_BOX.marginTop + PLOT_H / 2}" text-anchor="middle" class="axis-title"
-              transform="rotate(-90, 18, ${CHART_BOX.marginTop + PLOT_H / 2})">
+        <text x="15" y="${CHART_BOX.marginTop + PLOT_H / 2}" text-anchor="middle" class="axis-title"
+              transform="rotate(-90, 15, ${CHART_BOX.marginTop + PLOT_H / 2})">
           PM 2,5 (µg/m³)
         </text>
       `;
@@ -1735,11 +1927,13 @@
       function drawPt(idx, val, tag, extraCls = "") {
         const cx = xPos(idx);
         const cy = yPos(val);
-        const dy = val >= 160 ? 22 : -12;
+        const dy = val >= 160 ? 24 : -13;
+        const anchor = idx === 0 ? "start" : idx >= 6 ? "end" : "middle";
+        const tx = idx === 0 ? cx + 8 : idx >= 6 ? cx - 8 : cx;
         gPoints.innerHTML += `
           <g>
-            <circle cx="${cx}" cy="${cy}" r="7" class="plotted-point ${extraCls}" />
-            <text x="${cx}" y="${cy + dy}" text-anchor="middle" class="point-tag">${tag}</text>
+            <circle cx="${cx}" cy="${cy}" r="8" class="plotted-point ${extraCls}" />
+            <text x="${tx}" y="${cy + dy}" text-anchor="${anchor}" class="point-tag">${tag}</text>
           </g>
         `;
       }
@@ -1807,8 +2001,10 @@
 
       function nearestNode(evt) {
         const rect = svg.getBoundingClientRect();
-        const sx = (evt.clientX - rect.left) * (CHART_BOX.width / rect.width);
-        const sy = (evt.clientY - rect.top) * (CHART_BOX.height / rect.height);
+        const clientX = evt.touches && evt.touches[0] ? evt.touches[0].clientX : evt.clientX;
+        const clientY = evt.touches && evt.touches[0] ? evt.touches[0].clientY : evt.clientY;
+        const sx = (clientX - rect.left) * (CHART_BOX.width / rect.width);
+        const sy = (clientY - rect.top) * (CHART_BOX.height / rect.height);
 
         let bIdx = 0;
         let minDx = Infinity;
@@ -1819,6 +2015,10 @@
             bIdx = idx;
           }
         });
+
+        if (mode === "interactive-p8" && bIdx <= 1) {
+          bIdx = 0;
+        }
 
         const yCandidates = mode === "interactive-p8"
           ? [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200]
@@ -1842,7 +2042,7 @@
           yVal: bVal,
           px,
           py,
-          close: Math.hypot(sx - px, sy - py) < 44
+          close: Math.hypot(sx - px, sy - py) < 75
         };
       }
 
@@ -1854,10 +2054,10 @@
         }
         gHover.innerHTML = `
           <g style="pointer-events:none;">
-            <circle cx="${pt.px}" cy="${pt.py}" r="11" fill="rgba(44, 201, 107, 0.2)" />
-            <circle cx="${pt.px}" cy="${pt.py}" r="5" fill="#2cc96b" />
-            <rect x="${pt.px - 42}" y="${pt.py - 32}" width="84" height="20" rx="6" fill="#191919" />
-            <text x="${pt.px}" y="${pt.py - 18}" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">
+            <circle cx="${pt.px}" cy="${pt.py}" r="13" fill="rgba(44, 201, 107, 0.22)" />
+            <circle cx="${pt.px}" cy="${pt.py}" r="6" fill="#2cc96b" />
+            <rect x="${pt.px - 44}" y="${pt.py - 34}" width="88" height="22" rx="6" fill="#191919" />
+            <text x="${pt.px}" y="${pt.py - 19}" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">
               (${pt.xLabel}, ${pt.yVal})
             </text>
           </g>
@@ -1880,8 +2080,8 @@
           } else {
             openFeedbackTray(
               false,
-              `Você clicou em (${pt.xLabel}, ${pt.yVal})`,
-              "Procure exatamente o Ponto A (06h, 160) e o Ponto B (14h, 40) na grade.",
+              `Você tocou em (${pt.xLabel}, ${pt.yVal})`,
+              "Toque exatamente no Ponto A (06h, 160) e no Ponto B (14h, 40) na grade.",
               "Tentar Novamente"
             );
             return;
@@ -1932,8 +2132,8 @@
           } else {
             openFeedbackTray(
               false,
-              "Clique na coluna das 06h!",
-              "Para prever o nível de amanhã às 06h, clique sobre a primeira linha vertical (06h).",
+              "Toque na coluna das 06h!",
+              "Para prever o nível de amanhã às 06h, toque sobre a primeira linha vertical (06h) ou use os botões abaixo do gráfico.",
               "Entendi"
             );
           }
@@ -2385,7 +2585,6 @@
     window.addEventListener("hashchange", checkUrlHash);
 
     initTurmaUI();
-    syncRostersFromSupabase();
     checkUrlHash();
   </script>
 </body>
