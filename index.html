@@ -2161,21 +2161,29 @@
           .limit(400);
 
         if (!error && Array.isArray(data) && data.length > 0) {
-          return data.map((row) => {
-            let turma = row.turma || "";
-            let nome = row.aluno_nome || "";
+          const seen = new Set();
+          const uniqueRows = [];
+          for (const row of data) {
+            let turma = (row.turma || "").replace(/\uFFFD/g, "º");
+            let nome = (row.aluno_nome || "").trim();
             if (!turma && nome.includes(" - ")) {
               const parts = nome.split(" - ");
               turma = parts[0].trim();
               nome = parts.slice(1).join(" - ").trim();
             }
-            return {
-              turma: turma || "9º Ano",
-              aluno_nome: nome,
-              pm25_previsto: Number(row.pm25_previsto),
-              created_at: row.created_at
-            };
-          });
+            const cleanTurma = turma || "9º Ano";
+            const key = `${cleanTurma.toUpperCase()}::${nome.toUpperCase()}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              uniqueRows.push({
+                turma: cleanTurma,
+                aluno_nome: nome,
+                pm25_previsto: Number(row.pm25_previsto),
+                created_at: row.created_at
+              });
+            }
+          }
+          return uniqueRows;
         }
       } catch (e) {}
       return localData;
