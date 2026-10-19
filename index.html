@@ -1132,21 +1132,21 @@
   <canvas id="confetti-canvas"></canvas>
 
   <!-- =========================================================================
-       BARRA DE MÓDULOS DA PLATAFORMA (terceiroremota14)
+       CABEÇALHO DA ATIVIDADE — MATEMÁTICA 9º ANO (PROF. NATANAEL)
        ========================================================================= -->
   <header class="platform-header">
     <div class="platform-header-inner">
       <div class="brand-identity">
-        <div class="brand-logo-box">B</div>
+        <div class="brand-logo-box">xy</div>
         <div>
-          <div>Prof. Natanael • Plano Cartesiano & PM 2,5</div>
-          <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-muted);">
-            Manaus, AM • Conectado ao Supabase (terceiroremota14)
+          <div>Prof. Natanael • Matemática — 9º Ano</div>
+          <div style="font-size: 0.74rem; font-weight: 600; color: var(--text-muted);">
+            Plano Cartesiano • Qualidade do Ar em Manaus (PM 2,5)
           </div>
         </div>
       </div>
 
-      <nav class="module-tabs" aria-label="Módulos da Plataforma">
+      <nav class="module-tabs" id="top-module-tabs" aria-label="Navegação" style="display: none;">
         <button class="module-tab-btn active" id="tab-btn-aluno" onclick="switchPlatformModule('aluno')">
           Atividade dos alunos
         </button>
@@ -1154,18 +1154,18 @@
           Painel do professor
         </button>
         <button class="module-tab-btn" id="tab-btn-consulta" onclick="switchPlatformModule('consulta')">
-          Consulta de alunos e responsáveis
+          Consulta de entrega
         </button>
       </nav>
     </div>
   </header>
 
   <!-- =========================================================================
-       MÓDULO 1: [ATIVIDADE DOS ALUNOS] — 1 PÁGINA POR INTERATIVIDADE (BRILLIANT)
+       MÓDULO 1: [ATIVIDADE DOS ALUNOS]
        ========================================================================= -->
   <div class="view-section active" id="module-aluno">
 
-    <!-- HUD de Progresso do Aluno (8 etapas segmentadas estilo Brilliant.org) -->
+    <!-- Barra de Progresso do Aluno (8 etapas) -->
     <div class="brilliant-hud" id="brilliant-hud">
       <div class="hud-inner">
         <button class="hud-back-btn" id="hud-prev-btn" onclick="goPrevPage()" title="Voltar etapa">
@@ -1179,10 +1179,10 @@
     <main class="brilliant-stage">
       <!-- TELA DE ENTRADA: SELECIONAR A TURMA E DEPOIS O PRÓPRIO NOME -->
       <section class="brilliant-card" id="student-login-card">
-        <span class="page-kicker emerald">📍 Manaus, AM • 9º Ano Matemática</span>
-        <h1>A Curva da Fumaça (PM 2,5) no Plano Cartesiano</h1>
+        <span class="page-kicker emerald">📐 Matemática • 9º Ano — Prof. Natanael</span>
+        <h1>Plano Cartesiano: A Curva da Fumaça (PM 2,5) em Manaus</h1>
         <p class="lead-text">
-          Para iniciar sua atividade interativa (1 desafio por tela no estilo <strong>Brilliant.org</strong>), selecione primeiro a sua <strong>turma</strong> e depois o seu <strong>próprio nome</strong> na chamada:
+          Selecione a sua <strong>turma</strong> e depois o seu <strong>nome</strong> na chamada para iniciar a atividade:
         </p>
 
         <div class="login-grid">
@@ -1210,18 +1210,18 @@
           </div>
 
           <button class="btn-brilliant-start" id="btn-start-lesson" disabled onclick="startBrilliantLesson()">
-            Entrar na Atividade Interativa →
+            Iniciar Atividade →
           </button>
         </div>
       </section>
 
-      <!-- CONTAINER DE PÁGINA ÚNICA (UMA PÁGINA PARA CADA INTERATIVIDADE) -->
+      <!-- CONTAINER DE PÁGINA ÚNICA -->
       <section class="brilliant-card" id="lesson-page-card" style="display: none;">
         <div id="lesson-page-body"></div>
       </section>
     </main>
 
-    <!-- DRAWER DESLIZANTE INFERIOR DE FEEDBACK (BRILLIANT.ORG) -->
+    <!-- GAVETA INFERIOR DE FEEDBACK -->
     <div class="brilliant-bottom-tray" id="brilliant-tray">
       <div class="tray-inner">
         <div class="tray-content">
@@ -1243,15 +1243,15 @@
       <div class="brilliant-card">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
           <div>
-            <span class="page-kicker">📊 Painel do Professor • terceiroremota14</span>
-            <h2>Acompanhamento de Entregas e Previsões (PM 2,5)</h2>
+            <span class="page-kicker">📊 Painel do Professor • Matemática 9º Ano</span>
+            <h2>Acompanhamento de Entregas — Plano Cartesiano (PM 2,5)</h2>
             <p class="lead-text" style="margin-bottom: 0;">
-              Conectado a <code>https://bxvuqwnmqooxaoexnjty.supabase.co</code> na tabela exclusiva <code>previsoes_pm25_9ano</code> (nenhum projeto ou tabela anterior é alterado).
+              Relatório em tempo real das entregas das turmas <strong>9º 1</strong>, <strong>9º 2</strong> e <strong>9º 4</strong>.
             </p>
           </div>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <select class="select-control" id="prof-filter-turma" style="width: auto; padding: 10px 14px;" onchange="loadTeacherDashboard()">
-              <option value="TODAS">Todas as Turmas</option>
+              <option value="TODAS">Todas as Turmas (9º Ano)</option>
             </select>
             <button class="btn-check" onclick="loadTeacherDashboard()">🔄 Atualizar Agora</button>
             <button class="btn-check" style="background: var(--brilliant-green-dark);" onclick="exportTeacherCsv()">📥 Baixar CSV</button>
@@ -1273,9 +1273,9 @@
           <div class="kpi-value" id="kpi-rain-effect">--%</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Tabela no Supabase</div>
-          <div class="kpi-value" style="font-size: 1rem; color: var(--brilliant-green-dark); margin-top: 8px;">
-            previsoes_pm25_9ano
+          <div class="kpi-label">Turmas do 9º Ano</div>
+          <div class="kpi-value" style="font-size: 1.15rem; color: var(--brilliant-green-dark); margin-top: 8px;">
+            9º 1 • 9º 2 • 9º 4
           </div>
         </div>
       </div>
@@ -1760,7 +1760,7 @@
         }
       } else if (p === 8) {
         body.innerHTML = `
-          <span class="page-kicker emerald">Interatividade 8 de 8 • A Previsão Empírica (Salvando no Supabase)</span>
+          <span class="page-kicker emerald">Etapa 8 de 8 • A Previsão Empírica</span>
           <h2>Onde o Ponto de amanhã às 06h vai nascer?</h2>
           <p class="lead-text">
             🌧️ <strong>Ontem choveu forte em Manaus!</strong> A chuva "lava" as partículas PM 2,5 do ar.
@@ -2331,7 +2331,7 @@
 
         if (syncMsgEl) {
           syncMsgEl.innerHTML =
-            `☁️ Salvo no Supabase (<code>${SUPABASE_TABLE}</code>) para <strong>${selectedStudentName} • Turma ${selectedLoginTurma}</strong>!`;
+            `✅ Atividade concluída! Sua previsão <strong>(06h, ${predictedY} µg/m³)</strong> foi enviada para o Prof. Natanael (<strong>${selectedStudentName} • Turma ${selectedLoginTurma}</strong>).`;
         }
       } catch (err) {
         console.warn("Modo fallback local ativo:", err);
@@ -2579,8 +2579,14 @@
     // Suporte a link direto via hash (#professor ou #consulta)
     function checkUrlHash() {
       const h = window.location.hash.replace("#", "").toLowerCase();
-      if (h === "professor") switchPlatformModule("professor");
-      else if (h === "consulta") switchPlatformModule("consulta");
+      const tabsEl = document.getElementById("top-module-tabs");
+      if (h === "professor") {
+        if (tabsEl) tabsEl.style.display = "";
+        switchPlatformModule("professor");
+      } else if (h === "consulta") {
+        if (tabsEl) tabsEl.style.display = "";
+        switchPlatformModule("consulta");
+      }
     }
     window.addEventListener("hashchange", checkUrlHash);
 
